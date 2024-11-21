@@ -1,0 +1,14 @@
+# Ignore build directories
+dist/
+build/
+
+# Ignore node_modules
+node_modules/
+
+# Ignore .gitignore file
+.gitignore
+*.config.js
+*.json
+
+# Ignore logs
+*.log
