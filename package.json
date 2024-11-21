@@ -1,0 +1,67 @@
+{
+  "name": "spotify-clone-api",
+  "version": "0.1.0",
+  "description": "A simple Spotify clone API",
+
+  "main": "src/index.ts",
+  "engines": {
+    "node": ">=18.20.0"
+  },
+  "keywords": [
+    "cdn",
+    "content delivery network",
+    "images",
+    "performance",
+    "security",
+    "api",
+    "express",
+    "node.js",
+    "husky",
+    "lint-staged",
+    "prettier",
+    "eslint",
+    "rest-api",
+    "jwt",
+    "nodemon",
+    "typescript"
+  ],
+  "scripts": {
+    "start": "npx tsc && node dist/index.js",
+    "dev": "nodemon --watch ./src ./src/index.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write .",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "http-errors": "~1.6.3"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "eslint": "^9.15.0",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
