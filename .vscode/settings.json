@@ -3,7 +3,7 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
     },
-    "editor.tabSize": 2,
+    "editor.tabSize": 4,
     "editor.indentSize": "tabSize",
     "editor.insertSpaces": false,
     "files.autoSave": "onFocusChange",
