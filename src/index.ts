@@ -1,24 +1,60 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
-const createError = require('http-errors');
-const path = require('path');
-
-const indexRouter = require('./routes/index');
-const dotenv = require('dotenv');
-const swaggerUIPath = require('swagger-ui-express');
-const swaggerjsonFilePath = require('../docs/swagger.json');
-
-const router = require('./routes/index.ts');
+import createError from 'http-errors';
+import path from 'path';
+import dotenv from 'dotenv';
+import swaggerUIPath from 'swagger-ui-express';
+import swaggerjsonFilePath from '../docs/swagger.json';
+import indexRouter from './routes/index';
+import sessionMiddleware from './middlewares/session';
+import fileCacheMiddleware from './middlewares/fileCache';
+import cacheMiddleware from './middlewares/cache';
+import logger from './logger';
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const prisma = new PrismaClient();
 
-app.use(router);
+// ------------- Configuring the CORS
+const corsList = process.env.CORS_ORIGIN?.split(',');
+
+app.use(
+    cors({
+        origin: corsList,
+        credentials: true,
+    }),
+);
+
+// -------------- view engine setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(sessionMiddleware);
+
+if (process.env.INSTALL_REDIS === 'true') {
+    app.use(fileCacheMiddleware);
+    app.use(cacheMiddleware);
+}
+app.use((req, res, next) => {
+    logger.info(`${req.method} ${req.url}`);
+    next();
+});
+
+app.use('/', indexRouter);
+
+// -------------- swagger documentation
+
+app.use(
+    '/api-docs',
+    swaggerUIPath.serve,
+    swaggerUIPath.setup(swaggerjsonFilePath),
+);
+
+// -------------- catch 404 and forward to error handler
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -36,16 +72,7 @@ app.use(function (err: any, req: Request, res: Response) {
     res.render('error');
 });
 
-app.listen(PORT, () => {
-    console.log('Server running at PORT: ', PORT);
-});
-
-app.use('/', indexRouter);
-app.use(
-    '/api-docs',
-    swaggerUIPath.serve,
-    swaggerUIPath.setup(swaggerjsonFilePath),
-);
+// -------------- start the server
 
 app.listen(PORT, () => {
     console.log('Server is running on address: http://localhost:' + PORT);
@@ -59,6 +86,5 @@ app.listen(PORT, () => {
     throw new Error(error.message);
 });
 
-export {};
-
 module.exports = app;
+export default app;

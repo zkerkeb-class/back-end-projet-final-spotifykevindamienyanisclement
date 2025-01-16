@@ -5,12 +5,31 @@
     "title": "Spotify API",
     "description": "Spotify API Documentation"
   },
-  "host": "localhost:3000",
   "basePath": "/",
   "tags": [
     {
       "name": "Auth",
       "description": "auth related apis"
+    },
+    {
+      "name": "Upload",
+      "description": "Upload related apis"
+    },
+    {
+      "name": "Album",
+      "description": "Album related apis"
+    },
+    {
+      "name": "Artist",
+      "description": "Artist related apis"
+    },
+    {
+      "name": "PlaylistMusic",
+      "description": "Playlist related apis"
+    },
+    {
+      "name": "Artist",
+      "description": "ArtistGroups related apis"
     }
   ],
   "schemes": [
@@ -23,7 +42,811 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Register a new user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/successResponse.201"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Login a user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/successResponse.200"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.401"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/auth": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Get auth resource",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/successResponse.200"
+            }
+          }
+        }
+      }
+    },
+    "/artist": {
+      "post": {
+        "tags": [
+          "Artist"
+        ],
+        "description": "Create a new artist",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/artistCreate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/successResponse.201"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Artist"
+        ],
+        "description": "Get all artists",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/artistResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/artist/{id}": {
+      "get": {
+        "tags": [
+          "Artist"
+        ],
+        "description": "Get an artist by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/artistResponseFull"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.404"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Artist"
+        ],
+        "description": "Update an artist by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/artistCreate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/successResponse.200"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Artist"
+        ],
+        "description": "Delete an artist by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "schema": {
+              "$ref": "#/definitions/successResponse.204"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/album": {
+      "post": {
+        "tags": [
+          "Album"
+        ],
+        "description": "Create a new music album",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/albumCreate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/successResponse.201"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Album"
+        ],
+        "description": "Get all music albums",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/albumResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/album/{id}": {
+      "get": {
+        "tags": [
+          "Album"
+        ],
+        "description": "Get a music album by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/albumResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.404"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Album"
+        ],
+        "description": "Update a music album by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/albumCreate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/successResponse.200"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Album"
+        ],
+        "description": "Delete a music album by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "schema": {
+              "$ref": "#/definitions/successResponse.204"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/playlist": {
+      "post": {
+        "tags": [
+          "PlaylistMusic"
+        ],
+        "description": "Create a new playlist music",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/playlistCreate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/successResponse.201"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "PlaylistMusic"
+        ],
+        "description": "Get all playlist musics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/playlistRequest"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/playlist/{id}": {
+      "get": {
+        "tags": [
+          "PlaylistMusic"
+        ],
+        "description": "Get a playlist music by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/playlistRequestFull"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.404"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PlaylistMusic"
+        ],
+        "description": "Update a playlist music by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/playlistCreate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/successResponse.200"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PlaylistMusic"
+        ],
+        "description": "Delete a playlist music by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "schema": {
+              "$ref": "#/definitions/successResponse.204"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/group": {
+      "post": {
+        "tags": [
+          "Group"
+        ],
+        "description": "Create a new artist group",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/groupCreate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/successResponse.201"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "description": "Get all artist groups",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/groupResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/group/{id}": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "description": "Get an artist group by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/groupResponseFull"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.404"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Group"
+        ],
+        "description": "Update an artist group by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/groupCreate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/successResponse.200"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Group"
+        ],
+        "description": "Delete an artist group by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "schema": {
+              "$ref": "#/definitions/successResponse.204"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/upload/audio": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "description": "Endpoint to upload audio file",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "audio",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "The audio file to upload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/soundResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.400"
+            }
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/errorResponse.401"
+            },
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/upload/image": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "description": "Endpoint to upload image",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "image",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "The image file to upload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/imageResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.400"
+            }
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/errorResponse.401"
+            },
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
   "definitions": {
     "successResponse.200": {
       "type": "object",
@@ -35,6 +858,19 @@
         "message": {
           "type": "string",
           "example": "Success"
+        }
+      }
+    },
+    "successResponse.201": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "number",
+          "example": 201
+        },
+        "message": {
+          "type": "string",
+          "example": "Created"
         }
       }
     },
@@ -100,6 +936,507 @@
         "message": {
           "type": "string",
           "example": "An unexpected error occurred on the server. Please try again later."
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "example": "object"
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "file"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Fichier à uploader"
+                },
+                "in": {
+                  "type": "string",
+                  "example": "formData"
+                }
+              }
+            }
+          }
+        },
+        "required": {
+          "type": "array",
+          "example": [
+            "file"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "soundResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "duration": {
+          "type": "number",
+          "example": 1
+        },
+        "originalSoundName": {
+          "type": "string",
+          "example": "originalSoundName"
+        },
+        "originalSoundURL": {
+          "type": "string",
+          "example": "/originalSoundURL"
+        },
+        "wavSoundName": {
+          "type": "string",
+          "example": "wavSoundName"
+        },
+        "wavSoundURL": {
+          "type": "string",
+          "example": "/wavSoundURL"
+        },
+        "m4aSoundName": {
+          "type": "string",
+          "example": "m4aSoundName"
+        },
+        "m4aSoundURL": {
+          "type": "string",
+          "example": "/m4aSoundURL"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        }
+      }
+    },
+    "imageResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "formattedImageName": {
+          "type": "string",
+          "example": "formattedImageName"
+        },
+        "formattedImageURL": {
+          "type": "string",
+          "example": "/formattedImageURL"
+        },
+        "originalImageName": {
+          "type": "string",
+          "example": "originalImageName"
+        },
+        "originalImageURL": {
+          "type": "string",
+          "example": "/originalImageURL"
+        },
+        "avifImageName": {
+          "type": "string",
+          "example": "avifImageName"
+        },
+        "avifImageURL": {
+          "type": "string",
+          "example": "/avifImageURL"
+        },
+        "smallImageName": {
+          "type": "string",
+          "example": "smallImageName"
+        },
+        "smallImageURL": {
+          "type": "string",
+          "example": "/smallImageURL"
+        },
+        "mediumImageName": {
+          "type": "string",
+          "example": "mediumImageName"
+        },
+        "mediumImageURL": {
+          "type": "string",
+          "example": "/mediumImageURL"
+        },
+        "largeImageName": {
+          "type": "string",
+          "example": "largeImageName"
+        },
+        "largeImageURL": {
+          "type": "string",
+          "example": "/largeImageURL"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        }
+      }
+    },
+    "albumCreate": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Album Title"
+        },
+        "artisteId": {
+          "type": "number",
+          "example": 1
+        },
+        "groupId": {
+          "type": "number",
+          "example": 1
+        },
+        "imageId": {
+          "type": "number",
+          "example": 1
+        },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "example": "Track Title"
+              },
+              "soundId": {
+                "type": "number",
+                "example": 1
+              }
+            },
+            "required": [
+              "title",
+              "soundId"
+            ]
+          }
+        }
+      },
+      "required": [
+        "title",
+        "artisteId",
+        "groupId",
+        "imageId",
+        "tracks"
+      ]
+    },
+    "albumResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "title": {
+          "type": "string",
+          "example": "Album Title"
+        },
+        "image": {
+          "$ref": "#/definitions/imageResponse"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        }
+      }
+    },
+    "albumResponseFull": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "title": {
+          "type": "string",
+          "example": "Album Title"
+        },
+        "artiste": {
+          "$ref": "#/definitions/artistResponse"
+        },
+        "group": {
+          "$ref": "#/definitions/groupResponse"
+        },
+        "image": {
+          "$ref": "#/definitions/imageResponse"
+        },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "example": 1
+              },
+              "title": {
+                "type": "string",
+                "example": "Track Title"
+              },
+              "sound": {
+                "$ref": "#/definitions/soundResponse"
+              },
+              "albumId": {
+                "type": "number",
+                "example": 1
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2021-09-01T00:00:00.000Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "example": "2021-09-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        }
+      }
+    },
+    "artistCreate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Artist Name"
+        },
+        "imageId": {
+          "type": "number",
+          "example": 1
+        }
+      },
+      "required": [
+        "name",
+        "imageId"
+      ]
+    },
+    "artistResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Artist Name"
+        },
+        "image": {
+          "$ref": "#/definitions/imageResponse"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "image",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "artistResponseFull": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Artist Name"
+        },
+        "image": {
+          "$ref": "#/definitions/imageResponse"
+        },
+        "albums": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/albumResponse"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "image",
+        "albums",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "trackCreate": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Track Title"
+        },
+        "albumId": {
+          "type": "number",
+          "example": 1
+        },
+        "soundId": {
+          "type": "number",
+          "example": 1
+        }
+      },
+      "required": [
+        "title",
+        "albumId",
+        "soundId"
+      ]
+    },
+    "trackRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Track Title"
+        },
+        "sound": {
+          "$ref": "#/definitions/soundResponse"
+        },
+        "album": {
+          "$ref": "#/definitions/albumResponse"
+        }
+      },
+      "required": [
+        "title",
+        "sound",
+        "album"
+      ]
+    },
+    "groupCreate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Group Name"
+        },
+        "imageId": {
+          "type": "number",
+          "example": 1
+        },
+        "artists": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "artistId": {
+                "type": "number",
+                "example": 1
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "name",
+        "imageId",
+        "artists"
+      ]
+    },
+    "groupResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Group Name"
+        },
+        "image": {
+          "$ref": "#/definitions/imageResponse"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        }
+      }
+    },
+    "groupResponseFull": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Group Name"
+        },
+        "image": {
+          "$ref": "#/definitions/imageResponse"
+        },
+        "artists": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/artistResponse"
+          }
+        },
+        "albums": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/albumResponse"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
         }
       }
     }
