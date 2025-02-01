@@ -1,10 +1,10 @@
 import express from 'express';
 import {
-    createMusicAlbum,
-    getMusicAlbums,
-    getMusicAlbumById,
-    updateMusicAlbum,
-    deleteMusicAlbum,
+    createAlbum,
+    getAlbums,
+    getAlbumById,
+    updateAlbum,
+    deleteAlbum,
 } from '../controllers/album.controller';
 
 const router = express.Router();
@@ -23,7 +23,7 @@ router.post(
        #swagger.responses[201] = { schema: { $ref: '#/definitions/successResponse.201' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
-    createMusicAlbum,
+    createAlbum,
 );
 
 router.get(
@@ -34,7 +34,7 @@ router.get(
        #swagger.responses[200] = { schema: { $ref: '#/definitions/albumResponse' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
-    getMusicAlbums,
+    getAlbums,
 );
 
 router.get(
@@ -47,7 +47,7 @@ router.get(
        #swagger.responses[404] = { schema: { $ref: '#/definitions/errorResponse.404' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
-    getMusicAlbumById,
+    getAlbumById,
 );
 
 router.put(
@@ -65,7 +65,7 @@ router.put(
        #swagger.responses[200] = { schema: { $ref: '#/definitions/successResponse.200' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
-    updateMusicAlbum,
+    updateAlbum,
 );
 
 router.delete(
@@ -77,7 +77,7 @@ router.delete(
        #swagger.responses[204] = { schema: { $ref: '#/definitions/successResponse.204' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
-    deleteMusicAlbum,
+    deleteAlbum,
 );
 
 export default router;

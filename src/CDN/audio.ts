@@ -3,6 +3,7 @@ const fs = require('fs');
 import multer from 'multer';
 import { checkFileType } from './upload';
 import ffmpeg from 'fluent-ffmpeg';
+import { ISound, ISoundCreate } from '../types/interfaces/sound.interface';
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -59,12 +60,32 @@ const getRelativePath = (absolutePath: string): string => {
     }
 };
 
-const formatAudio = async (file: any) => {
+interface IAudioFormat {
+    filename: string;
+    relativePath: string;
+}
+
+interface IAudioFormats {
+    m4aAudio: IAudioFormat;
+    originalAudio: IAudioFormat;
+    wavAudio: IAudioFormat;
+}
+
+const formatAudio = async (file: any): Promise<ISoundCreate> => {
     try {
-        var metadatas = {
-            m4aAudio: {},
-            originalAudio: {},
-            wavAudio: {},
+        var metadatas: IAudioFormats = {
+            m4aAudio: {
+                filename: '',
+                relativePath: '',
+            },
+            originalAudio: {
+                filename: '',
+                relativePath: '',
+            },
+            wavAudio: {
+                filename: '',
+                relativePath: '',
+            },
         };
         metadatas.originalAudio = {
             filename: file.filename,
@@ -85,7 +106,17 @@ const formatAudio = async (file: any) => {
             relativePath: getRelativePath(wavAudio.path),
         };
 
-        return metadatas;
+        const duration = await getAudioDuration(file.path);
+
+        return {
+            originalSoundName: metadatas.originalAudio?.filename,
+            originalSoundURL: metadatas.originalAudio?.relativePath,
+            wavSoundName: metadatas.wavAudio?.filename,
+            wavSoundURL: metadatas.wavAudio?.relativePath,
+            m4aSoundName: '',
+            m4aSoundURL: '',
+            duration, // Ajouter la durée ici
+        };
     } catch (error: any) {
         console.error(`format audio error 2 : ${error.message}`);
         throw new Error(error.message);
@@ -122,5 +153,20 @@ const changeAudioFormat = async (file: any, format: string) => {
             .save(outputPath);
     });
 };
-
+const getAudioDuration = (filePath: string): Promise<number> => {
+    return new Promise((resolve, reject) => {
+        ffmpeg.ffprobe(filePath, (err, metadata) => {
+            if (err) {
+                reject(err);
+            } else {
+                const duration = metadata.format.duration;
+                if (duration !== undefined) {
+                    resolve(duration);
+                } else {
+                    reject(new Error('Unable to retrieve audio duration'));
+                }
+            }
+        });
+    });
+};
 export { uploadAudio, formatAudio };

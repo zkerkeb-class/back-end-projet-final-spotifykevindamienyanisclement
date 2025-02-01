@@ -11,10 +11,10 @@ datasource db {
 model Image {
   id Int @id @default(autoincrement())
 
-  formattedImageName String
-  formattedImageURL  String
   originalImageName  String
   originalImageURL   String
+  formattedImageName String
+  formattedImageURL  String
   avifImageName      String
   avifImageURL       String
   smallImageName     String
@@ -24,11 +24,13 @@ model Image {
   largeImageName     String
   largeImageURL      String
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  Artiste     Artiste[]
-  MusicAlbum  MusicAlbum[]
-  ArtistGroup ArtistGroup[]
+  artists   artist[]
+  albums    Album[]
+  groups    Group[]
+  playlists Playlist[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Sound {
@@ -42,9 +44,10 @@ model Sound {
   m4aSoundName      String
   m4aSoundURL       String
 
+  tracks Track[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Track     Track[]
 }
 
 model User {
@@ -53,40 +56,43 @@ model User {
   name     String?
   password String
 
-  PlaylistMusic PlaylistMusic[]
+  playlists Playlist[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Artiste {
+model artist {
   id   Int    @id @default(autoincrement())
   name String
 
   image   Image? @relation(fields: [imageId], references: [id])
   imageId Int?
 
-  artistGroupId Int?
-  artistGroup   ArtistGroup? @relation(fields: [artistGroupId], references: [id])
+  groupId Int?
+  group   Group? @relation(fields: [groupId], references: [id])
 
-  MusicAlbum MusicAlbum[]
+  albums Album[]
+  tracks Track[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model MusicAlbum {
+model Album {
   id    Int    @id @default(autoincrement())
   title String
 
   image   Image? @relation(fields: [imageId], references: [id])
   imageId Int?
 
-  artisteId Int?
-  artiste   Artiste?     @relation(fields: [artisteId], references: [id])
-  groupId   Int?
-  group     ArtistGroup? @relation(fields: [groupId], references: [id])
-  Track     Track[]
+  artistId Int?
+  artist   artist? @relation(fields: [artistId], references: [id])
+
+  groupId Int?
+  group   Group? @relation(fields: [groupId], references: [id])
+
+  tracks Track[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -96,40 +102,43 @@ model Track {
   id    Int    @id @default(autoincrement())
   title String
 
-  soundId         Int?
-  sound           Sound?         @relation(fields: [soundId], references: [id])
-  albumId         Int
-  album           MusicAlbum     @relation(fields: [albumId], references: [id])
-  PlaylistMusic   PlaylistMusic? @relation(fields: [playlistMusicId], references: [id])
-  playlistMusicId Int?
+  soundId    Int?
+  sound      Sound?    @relation(fields: [soundId], references: [id])
+  albumId    Int
+  album      Album     @relation(fields: [albumId], references: [id])
+  playlist   Playlist? @relation(fields: [playlistId], references: [id])
+  playlistId Int?
+  artist     artist?   @relation(fields: [artistId], references: [id])
+  artistId   Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model PlaylistMusic {
-  id    Int    @id @default(autoincrement())
-  title String
-
-  Tracks Track[]
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ArtistGroup {
+model Playlist {
   id    Int    @id @default(autoincrement())
   title String
 
   imageId Int?
+  image   Image?  @relation(fields: [imageId], references: [id])
+  userId  Int
+  user    User    @relation(fields: [userId], references: [id])
+  tracks  Track[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Group {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  imageId Int?
   image   Image? @relation(fields: [imageId], references: [id])
 
-  artists Artiste[]
+  artists artist[]
+  albums  Album[]
 
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  MusicAlbum MusicAlbum[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

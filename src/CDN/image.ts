@@ -4,6 +4,7 @@ const fs = require('fs');
 import multer from 'multer';
 import { checkFileType } from './upload';
 import { relative } from 'path';
+import { IImageCreate } from 'src/types/interfaces/image.interface';
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -76,47 +77,77 @@ const getRelativePath = (absolutePath: string): string => {
     return relativePath.split(path.sep).join('/');
 };
 
-const formatImage = async (file: any) => {
+const formatImage = async (file: any): Promise<IImageCreate> => {
     try {
-        var metadatas = {
-            formattedImage: {},
-            avifImage: {},
-            smallImage: {},
-            mediumImage: {},
-            largeImage: {},
+        const filePath = file.path;
+        const fileName = path.basename(filePath, path.extname(filePath));
+
+        const formattedImageName = `${fileName}-formatted.webp`;
+        const formattedImagePath = path.join(
+            path.dirname(filePath),
+            formattedImageName,
+        );
+
+        await sharp(filePath)
+            .resize(800)
+            .toFormat('webp')
+            .toFile(formattedImagePath);
+
+        const avifImageName = `${fileName}-formatted.avif`;
+        const avifImagePath = path.join(path.dirname(filePath), avifImageName);
+
+        await sharp(filePath)
+            .resize(800)
+            .toFormat('avif')
+            .toFile(avifImagePath);
+
+        const smallImageName = `${fileName}-small.webp`;
+        const smallImagePath = path.join(
+            path.dirname(filePath),
+            smallImageName,
+        );
+
+        await sharp(filePath)
+            .resize(400)
+            .toFormat('webp')
+            .toFile(smallImagePath);
+
+        const mediumImageName = `${fileName}-medium.webp`;
+        const mediumImagePath = path.join(
+            path.dirname(filePath),
+            mediumImageName,
+        );
+
+        await sharp(filePath)
+            .resize(800)
+            .toFormat('webp')
+            .toFile(mediumImagePath);
+
+        const largeImageName = `${fileName}-large.webp`;
+        const largeImagePath = path.join(
+            path.dirname(filePath),
+            largeImageName,
+        );
+
+        await sharp(filePath)
+            .resize(1200)
+            .toFormat('webp')
+            .toFile(largeImagePath);
+
+        return {
+            originalImageName: file.originalname,
+            originalImageURL: filePath,
+            formattedImageName,
+            formattedImageURL: formattedImagePath,
+            avifImageName,
+            avifImageURL: avifImagePath,
+            smallImageName,
+            smallImageURL: smallImagePath,
+            mediumImageName,
+            mediumImageURL: mediumImagePath,
+            largeImageName,
+            largeImageURL: largeImagePath,
         };
-        const formattedImage = await changeImageFormat(file, 'webp');
-        metadatas.formattedImage = {
-            filename: file.filename,
-            relativePath: getRelativePath(file.path),
-        };
-        console.log('formattedImage', formattedImage);
-        const avifImage = await changeImageFormat(formattedImage, 'avif');
-        metadatas.avifImage = {
-            filename: avifImage.filename,
-            relativePath: getRelativePath(avifImage.path),
-        };
-        console.log('avifImage', avifImage);
-        const smallImage = await optimizeImage(formattedImage, 400, 'small');
-        metadatas.smallImage = {
-            filename: smallImage.filename,
-            relativePath: getRelativePath(smallImage.path),
-        };
-        console.log('smallImage', smallImage);
-        const mediumImage = await optimizeImage(formattedImage, 800, 'medium');
-        metadatas.mediumImage = {
-            filename: mediumImage.filename,
-            relativePath: getRelativePath(mediumImage.path),
-        };
-        console.log('mediumImage', mediumImage);
-        const largeImage = await optimizeImage(formattedImage, 1200, 'large');
-        metadatas.largeImage = {
-            filename: largeImage.filename,
-            relativePath: getRelativePath(largeImage.path),
-        };
-        console.log('largeImage', largeImage);
-        // console.log('optimizedImage', optimizedImage);
-        return metadatas;
     } catch (error: any) {
         console.error(`Change format error: ${error.message}`);
         throw new Error(error.message);

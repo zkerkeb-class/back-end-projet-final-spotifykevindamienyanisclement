@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import {
-    createArtistGroup,
-    getArtistGroups,
-    getArtistGroupById,
-    updateArtistGroup,
-    deleteArtistGroup,
-} from '../src/controllers/artistGroup.controller';
+    createGroup,
+    getGroups,
+    getGroupById,
+    updateGroup,
+    deleteGroup,
+} from '../src/controllers/group.controller';
 
 jest.mock('@prisma/client', () => {
     const mPrismaClient = {
-        artistGroup: {
+        group: {
             create: jest.fn(),
             findMany: jest.fn(),
             findUnique: jest.fn(),
@@ -23,7 +23,7 @@ jest.mock('@prisma/client', () => {
 
 const prisma = new PrismaClient();
 
-describe('ArtistGroup Controller', () => {
+describe('Group Controller', () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
     let jsonMock: jest.Mock;
@@ -46,17 +46,17 @@ describe('ArtistGroup Controller', () => {
         jest.clearAllMocks();
     });
 
-    describe('createArtistGroup', () => {
+    describe('createGroup', () => {
         it('should create a new artist group', async () => {
             req.body = { title: 'Test Artist Group' };
-            (prisma.artistGroup.create as jest.Mock).mockResolvedValue({
+            (prisma.group.create as jest.Mock).mockResolvedValue({
                 id: 1,
                 title: 'Test Artist Group',
             });
 
-            await createArtistGroup(req as Request, res as Response);
+            await createGroup(req as Request, res as Response);
 
-            expect(prisma.artistGroup.create).toHaveBeenCalledWith({
+            expect(prisma.group.create).toHaveBeenCalledWith({
                 data: { title: 'Test Artist Group' },
             });
             expect(statusMock).toHaveBeenCalledWith(201);
@@ -68,11 +68,11 @@ describe('ArtistGroup Controller', () => {
 
         it('should handle errors during artist group creation', async () => {
             req.body = { title: 'Test Artist Group' };
-            (prisma.artistGroup.create as jest.Mock).mockRejectedValue(
+            (prisma.group.create as jest.Mock).mockRejectedValue(
                 new Error('Creation error'),
             );
 
-            await createArtistGroup(req as Request, res as Response);
+            await createGroup(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -82,29 +82,27 @@ describe('ArtistGroup Controller', () => {
         });
     });
 
-    describe('getArtistGroups', () => {
+    describe('getGroups', () => {
         it('should get all artist groups', async () => {
-            const artistGroups = [
+            const groups = [
                 { id: 1, title: 'Artist Group 1' },
                 { id: 2, title: 'Artist Group 2' },
             ];
-            (prisma.artistGroup.findMany as jest.Mock).mockResolvedValue(
-                artistGroups,
-            );
+            (prisma.group.findMany as jest.Mock).mockResolvedValue(groups);
 
-            await getArtistGroups(req as Request, res as Response);
+            await getGroups(req as Request, res as Response);
 
-            expect(prisma.artistGroup.findMany).toHaveBeenCalled();
+            expect(prisma.group.findMany).toHaveBeenCalled();
             expect(statusMock).toHaveBeenCalledWith(200);
-            expect(jsonMock).toHaveBeenCalledWith(artistGroups);
+            expect(jsonMock).toHaveBeenCalledWith(groups);
         });
 
         it('should handle errors during fetching artist groups', async () => {
-            (prisma.artistGroup.findMany as jest.Mock).mockRejectedValue(
+            (prisma.group.findMany as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
 
-            await getArtistGroups(req as Request, res as Response);
+            await getGroups(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -114,30 +112,26 @@ describe('ArtistGroup Controller', () => {
         });
     });
 
-    describe('getArtistGroupById', () => {
+    describe('getGroupById', () => {
         it('should get an artist group by ID', async () => {
             req.params = { id: '1' };
-            const artistGroup = { id: 1, title: 'Artist Group 1' };
-            (prisma.artistGroup.findUnique as jest.Mock).mockResolvedValue(
-                artistGroup,
-            );
+            const group = { id: 1, title: 'Artist Group 1' };
+            (prisma.group.findUnique as jest.Mock).mockResolvedValue(group);
 
-            await getArtistGroupById(req as Request, res as Response);
+            await getGroupById(req as Request, res as Response);
 
-            expect(prisma.artistGroup.findUnique).toHaveBeenCalledWith({
+            expect(prisma.group.findUnique).toHaveBeenCalledWith({
                 where: { id: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
-            expect(jsonMock).toHaveBeenCalledWith(artistGroup);
+            expect(jsonMock).toHaveBeenCalledWith(group);
         });
 
         it('should return 404 if artist group not found', async () => {
             req.params = { id: '1' };
-            (prisma.artistGroup.findUnique as jest.Mock).mockResolvedValue(
-                null,
-            );
+            (prisma.group.findUnique as jest.Mock).mockResolvedValue(null);
 
-            await getArtistGroupById(req as Request, res as Response);
+            await getGroupById(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(404);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -147,11 +141,11 @@ describe('ArtistGroup Controller', () => {
 
         it('should handle errors during fetching artist group by ID', async () => {
             req.params = { id: '1' };
-            (prisma.artistGroup.findUnique as jest.Mock).mockRejectedValue(
+            (prisma.group.findUnique as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
 
-            await getArtistGroupById(req as Request, res as Response);
+            await getGroupById(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -161,33 +155,31 @@ describe('ArtistGroup Controller', () => {
         });
     });
 
-    describe('updateArtistGroup', () => {
+    describe('updateGroup', () => {
         it('should update an artist group by ID', async () => {
             req.params = { id: '1' };
             req.body = { title: 'Updated Artist Group' };
-            const updatedArtistGroup = { id: 1, title: 'Updated Artist Group' };
-            (prisma.artistGroup.update as jest.Mock).mockResolvedValue(
-                updatedArtistGroup,
-            );
+            const updatedGroup = { id: 1, title: 'Updated Artist Group' };
+            (prisma.group.update as jest.Mock).mockResolvedValue(updatedGroup);
 
-            await updateArtistGroup(req as Request, res as Response);
+            await updateGroup(req as Request, res as Response);
 
-            expect(prisma.artistGroup.update).toHaveBeenCalledWith({
+            expect(prisma.group.update).toHaveBeenCalledWith({
                 where: { id: 1 },
                 data: { title: 'Updated Artist Group' },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
-            expect(jsonMock).toHaveBeenCalledWith(updatedArtistGroup);
+            expect(jsonMock).toHaveBeenCalledWith(updatedGroup);
         });
 
         it('should handle errors during updating artist group', async () => {
             req.params = { id: '1' };
             req.body = { title: 'Updated Artist Group' };
-            (prisma.artistGroup.update as jest.Mock).mockRejectedValue(
+            (prisma.group.update as jest.Mock).mockRejectedValue(
                 new Error('Updating error'),
             );
 
-            await updateArtistGroup(req as Request, res as Response);
+            await updateGroup(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -197,14 +189,14 @@ describe('ArtistGroup Controller', () => {
         });
     });
 
-    describe('deleteArtistGroup', () => {
+    describe('deleteGroup', () => {
         it('should delete an artist group by ID', async () => {
             req.params = { id: '1' };
-            (prisma.artistGroup.delete as jest.Mock).mockResolvedValue({});
+            (prisma.group.delete as jest.Mock).mockResolvedValue({});
 
-            await deleteArtistGroup(req as Request, res as Response);
+            await deleteGroup(req as Request, res as Response);
 
-            expect(prisma.artistGroup.delete).toHaveBeenCalledWith({
+            expect(prisma.group.delete).toHaveBeenCalledWith({
                 where: { id: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(204);
@@ -213,11 +205,11 @@ describe('ArtistGroup Controller', () => {
 
         it('should handle errors during deleting artist group', async () => {
             req.params = { id: '1' };
-            (prisma.artistGroup.delete as jest.Mock).mockRejectedValue(
+            (prisma.group.delete as jest.Mock).mockRejectedValue(
                 new Error('Deleting error'),
             );
 
-            await deleteArtistGroup(req as Request, res as Response);
+            await deleteGroup(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({

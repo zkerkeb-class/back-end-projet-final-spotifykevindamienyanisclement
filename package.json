@@ -30,6 +30,8 @@
     "swagger": "node ./src/swagger.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "ts": "tsc",
+    "ts:check": "tsc --noEmit",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "prepare": "husky",

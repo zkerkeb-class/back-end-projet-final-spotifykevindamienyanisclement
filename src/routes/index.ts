@@ -2,11 +2,12 @@ import express from 'express';
 import authRoute from './auth.route';
 import artistRoute from './artist.route';
 import albumRoute from './album.route';
-import playlistMusicRoute from './playlist.route';
-import artistGroupRoute from './artistGroup.route';
+import playlistRoute from './playlist.route';
+import groupRoute from './group';
 import uploadRoute from './upload.route';
+import trackRoute from './track.route';
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 /**
  * @swagger
@@ -52,26 +53,26 @@ router.use('/album', albumRoute);
  * /playlist-music:
  *   get:
  *     tags:
- *       - PlaylistMusic
+ *       - Playlist
  *     summary: Get playlist music resource
  *     responses:
  *       200:
  *         description: Playlist music resource
  */
-router.use('/playlist', playlistMusicRoute);
+router.use('/playlist', playlistRoute);
 
 /**
  * @swagger
  * /artist-groups:
  *   get:
  *     tags:
- *       - ArtistGroups
+ *       - Groups
  *     summary: Get artist groups resource
  *     responses:
  *       200:
  *         description: Artist groups resource
  */
-router.use('/group', artistGroupRoute);
+router.use('/group', groupRoute);
 
 /**
  * @swagger
@@ -85,5 +86,18 @@ router.use('/group', artistGroupRoute);
  *         description: Upload resource
  */
 router.use('/upload', uploadRoute);
+
+/**
+ * @swagger
+ * /album/{albumId}/track:
+ *   get:
+ *     tags:
+ *       - Track
+ *     summary: Get tracks resource
+ *     responses:
+ *       200:
+ *         description: Tracks resource
+ */
+router.use('/album/:albumId/track', trackRoute);
 
 export default router;

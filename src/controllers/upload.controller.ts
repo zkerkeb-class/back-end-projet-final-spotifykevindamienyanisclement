@@ -1,28 +1,37 @@
 import { formatImage } from '../CDN/image';
 import { formatAudio } from '../CDN/audio';
+import { ISound, ISoundCreate } from '../types/interfaces/sound.interface';
+import { IImage, IImageCreate } from '../types/interfaces/image.interface';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const uploadController = {
     uploadAudio: async (req: any, res: any) => {
-        const audio = req.file;
-        console.log(audio);
+        const audioUpload = req.file;
+        console.log(audioUpload);
 
-        if (!audio) {
-            return res.status(400).json({
+        if (!audioUpload) {
+            res.status(400).json({
                 success: false,
                 message: 'Aucun fichier uploadé',
             });
         }
 
         try {
-            const formattedAudio = await formatAudio(audio);
-            console.log(formattedAudio);
-            return res.send({
+            const formattedAudio: ISoundCreate = await formatAudio(audioUpload);
+
+            const audio: ISound = await prisma.sound.create({
+                data: formattedAudio,
+            });
+
+            res.send({
                 message: 'File uploaded successfully',
-                formattedAudio,
+                audio,
             });
         } catch (error: any) {
             console.error(`Change format error: ${error.message}`);
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "Erreur lors du changement de format de l'audio",
             });
@@ -35,7 +44,7 @@ const uploadController = {
 
         // Vérifier si un fichier a été uploadé
         if (!file) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: 'Aucun fichier uploadé',
             });
@@ -43,14 +52,19 @@ const uploadController = {
 
         // Changer le format de l'image
         try {
-            const formattedImage = await formatImage(file);
-            return res.send({
+            const formattedImage: IImageCreate = await formatImage(file);
+
+            const image: IImage = await prisma.image.create({
+                data: formattedImage,
+            });
+
+            res.send({
                 message: 'File uploaded successfully',
-                formattedImage,
+                image,
             });
         } catch (error: any) {
             console.error(`Change format error: ${error.message}`);
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "Erreur lors du changement de format de l'image",
             });

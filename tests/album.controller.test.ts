@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import {
-    createMusicAlbum,
-    getMusicAlbums,
-    getMusicAlbumById,
-    updateMusicAlbum,
-    deleteMusicAlbum,
+    createAlbum,
+    getAlbums,
+    getAlbumById,
+    updateAlbum,
+    deleteAlbum,
 } from '../src/controllers/album.controller';
 
 jest.mock('@prisma/client', () => {
     const mPrismaClient = {
-        musicAlbum: {
+        album: {
             create: jest.fn(),
             findMany: jest.fn(),
             findUnique: jest.fn(),
@@ -46,35 +46,35 @@ describe('Album Controller', () => {
         jest.clearAllMocks();
     });
 
-    describe('createMusicAlbum', () => {
+    describe('createAlbum', () => {
         it('should create a new music album', async () => {
-            req.body = { title: 'Test Album', artisteId: 1 };
-            (prisma.musicAlbum.create as jest.Mock).mockResolvedValue({
+            req.body = { title: 'Test Album', artistId: 1 };
+            (prisma.album.create as jest.Mock).mockResolvedValue({
                 id: 1,
                 title: 'Test Album',
-                artisteId: 1,
+                artistId: 1,
             });
 
-            await createMusicAlbum(req as Request, res as Response);
+            await createAlbum(req as Request, res as Response);
 
-            expect(prisma.musicAlbum.create).toHaveBeenCalledWith({
-                data: { title: 'Test Album', artisteId: 1 },
+            expect(prisma.album.create).toHaveBeenCalledWith({
+                data: { title: 'Test Album', artistId: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(201);
             expect(jsonMock).toHaveBeenCalledWith({
                 id: 1,
                 title: 'Test Album',
-                artisteId: 1,
+                artistId: 1,
             });
         });
 
         it('should handle errors during album creation', async () => {
-            req.body = { title: 'Test Album', artisteId: 1 };
-            (prisma.musicAlbum.create as jest.Mock).mockRejectedValue(
+            req.body = { title: 'Test Album', artistId: 1 };
+            (prisma.album.create as jest.Mock).mockRejectedValue(
                 new Error('Creation error'),
             );
 
-            await createMusicAlbum(req as Request, res as Response);
+            await createAlbum(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -84,27 +84,27 @@ describe('Album Controller', () => {
         });
     });
 
-    describe('getMusicAlbums', () => {
+    describe('getAlbums', () => {
         it('should get all music albums', async () => {
             const albums = [
-                { id: 1, title: 'Album 1', artisteId: 1 },
-                { id: 2, title: 'Album 2', artisteId: 2 },
+                { id: 1, title: 'Album 1', artistId: 1 },
+                { id: 2, title: 'Album 2', artistId: 2 },
             ];
-            (prisma.musicAlbum.findMany as jest.Mock).mockResolvedValue(albums);
+            (prisma.album.findMany as jest.Mock).mockResolvedValue(albums);
 
-            await getMusicAlbums(req as Request, res as Response);
+            await getAlbums(req as Request, res as Response);
 
-            expect(prisma.musicAlbum.findMany).toHaveBeenCalled();
+            expect(prisma.album.findMany).toHaveBeenCalled();
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith(albums);
         });
 
         it('should handle errors during fetching albums', async () => {
-            (prisma.musicAlbum.findMany as jest.Mock).mockRejectedValue(
+            (prisma.album.findMany as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
 
-            await getMusicAlbums(req as Request, res as Response);
+            await getAlbums(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -114,17 +114,15 @@ describe('Album Controller', () => {
         });
     });
 
-    describe('getMusicAlbumById', () => {
+    describe('getAlbumById', () => {
         it('should get a music album by ID', async () => {
             req.params = { id: '1' };
-            const album = { id: 1, title: 'Album 1', artisteId: 1 };
-            (prisma.musicAlbum.findUnique as jest.Mock).mockResolvedValue(
-                album,
-            );
+            const album = { id: 1, title: 'Album 1', artistId: 1 };
+            (prisma.album.findUnique as jest.Mock).mockResolvedValue(album);
 
-            await getMusicAlbumById(req as Request, res as Response);
+            await getAlbumById(req as Request, res as Response);
 
-            expect(prisma.musicAlbum.findUnique).toHaveBeenCalledWith({
+            expect(prisma.album.findUnique).toHaveBeenCalledWith({
                 where: { id: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
@@ -133,9 +131,9 @@ describe('Album Controller', () => {
 
         it('should return 404 if album not found', async () => {
             req.params = { id: '1' };
-            (prisma.musicAlbum.findUnique as jest.Mock).mockResolvedValue(null);
+            (prisma.album.findUnique as jest.Mock).mockResolvedValue(null);
 
-            await getMusicAlbumById(req as Request, res as Response);
+            await getAlbumById(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(404);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -145,11 +143,11 @@ describe('Album Controller', () => {
 
         it('should handle errors during fetching album by ID', async () => {
             req.params = { id: '1' };
-            (prisma.musicAlbum.findUnique as jest.Mock).mockRejectedValue(
+            (prisma.album.findUnique as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
 
-            await getMusicAlbumById(req as Request, res as Response);
+            await getAlbumById(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -159,24 +157,22 @@ describe('Album Controller', () => {
         });
     });
 
-    describe('updateMusicAlbum', () => {
+    describe('updateAlbum', () => {
         it('should update a music album by ID', async () => {
             req.params = { id: '1' };
-            req.body = { title: 'Updated Album', artisteId: 1 };
+            req.body = { title: 'Updated Album', artistId: 1 };
             const updatedAlbum = {
                 id: 1,
                 title: 'Updated Album',
-                artisteId: 1,
+                artistId: 1,
             };
-            (prisma.musicAlbum.update as jest.Mock).mockResolvedValue(
-                updatedAlbum,
-            );
+            (prisma.album.update as jest.Mock).mockResolvedValue(updatedAlbum);
 
-            await updateMusicAlbum(req as Request, res as Response);
+            await updateAlbum(req as Request, res as Response);
 
-            expect(prisma.musicAlbum.update).toHaveBeenCalledWith({
+            expect(prisma.album.update).toHaveBeenCalledWith({
                 where: { id: 1 },
-                data: { title: 'Updated Album', artisteId: 1 },
+                data: { title: 'Updated Album', artistId: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith(updatedAlbum);
@@ -184,12 +180,12 @@ describe('Album Controller', () => {
 
         it('should handle errors during updating album', async () => {
             req.params = { id: '1' };
-            req.body = { title: 'Updated Album', artisteId: 1 };
-            (prisma.musicAlbum.update as jest.Mock).mockRejectedValue(
+            req.body = { title: 'Updated Album', artistId: 1 };
+            (prisma.album.update as jest.Mock).mockRejectedValue(
                 new Error('Updating error'),
             );
 
-            await updateMusicAlbum(req as Request, res as Response);
+            await updateAlbum(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -199,14 +195,14 @@ describe('Album Controller', () => {
         });
     });
 
-    describe('deleteMusicAlbum', () => {
+    describe('deleteAlbum', () => {
         it('should delete a music album by ID', async () => {
             req.params = { id: '1' };
-            (prisma.musicAlbum.delete as jest.Mock).mockResolvedValue({});
+            (prisma.album.delete as jest.Mock).mockResolvedValue({});
 
-            await deleteMusicAlbum(req as Request, res as Response);
+            await deleteAlbum(req as Request, res as Response);
 
-            expect(prisma.musicAlbum.delete).toHaveBeenCalledWith({
+            expect(prisma.album.delete).toHaveBeenCalledWith({
                 where: { id: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(204);
@@ -215,11 +211,11 @@ describe('Album Controller', () => {
 
         it('should handle errors during deleting album', async () => {
             req.params = { id: '1' };
-            (prisma.musicAlbum.delete as jest.Mock).mockRejectedValue(
+            (prisma.album.delete as jest.Mock).mockRejectedValue(
                 new Error('Deleting error'),
             );
 
-            await deleteMusicAlbum(req as Request, res as Response);
+            await deleteAlbum(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({

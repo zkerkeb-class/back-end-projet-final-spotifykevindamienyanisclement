@@ -31,12 +31,12 @@ const doc = {
             description: 'Artist related apis',
         },
         {
-            name: 'PlaylistMusic',
+            name: 'Playlist',
             description: 'Playlist related apis',
         },
         {
             name: 'Artist',
-            description: 'ArtistGroups related apis',
+            description: 'Groups related apis',
         },
     ],
     securityDefinitions: {},
@@ -119,7 +119,7 @@ const doc = {
 
         albumCreate: {
             $title: 'Album Title',
-            $artisteId: 1,
+            $artistId: 1,
             $groupId: 1,
             $imageId: 1,
             $tracks: [
@@ -195,11 +195,6 @@ const doc = {
         groupCreate: {
             $name: 'Group Name',
             $imageId: 1,
-            $artists: [
-                {
-                    artistId: 1,
-                },
-            ],
         },
 
         groupResponse: {
@@ -216,6 +211,55 @@ const doc = {
             image: { $ref: '#/definitions/imageResponse' },
             artists: [{ $ref: '#/definitions/artistResponse' }],
             albums: [{ $ref: '#/definitions/albumResponse' }],
+            createdAt: '2021-09-01T00:00:00.000Z',
+            updatedAt: '2021-09-01T00:00:00.000Z',
+        },
+
+        userResponse: {
+            id: 1,
+            name: 'name',
+            email: 'email',
+            createdAt: '2021-09-01T00:00:00.000Z',
+            updatedAt: '2021-09-01T00:00:00.000Z',
+        },
+
+        userResponseFull: {
+            id: 1,
+            name: 'name',
+            email: 'email',
+            playlists: [{ $ref: '#/definitions/playlistResponse' }],
+            createdAt: '2021-09-01T00:00:00.000Z',
+            updatedAt: '2021-09-01T00:00:00.000Z',
+        },
+
+        playlistCreate: {
+            $title: 'Playlist Title',
+            $userId: 1,
+            $imageId: 1,
+        },
+
+        playlistRequest: {
+            id: 1,
+            title: 'Playlist Title',
+
+            image: { $ref: '#/definitions/imageResponse' },
+            imageId: 1,
+            userId: 1,
+
+            createdAt: '2021-09-01T00:00:00.000Z',
+            updatedAt: '2021-09-01T00:00:00.000Z',
+        },
+
+        playlistRequestFull: {
+            id: 1,
+            title: 'Playlist Title',
+
+            image: { $ref: '#/definitions/imageResponse' },
+            imageId: 1,
+            user: { $ref: '#/definitions/userResponse' },
+            userId: 1,
+            tracks: [{ $ref: '#/definitions/trackResponse' }],
+
             createdAt: '2021-09-01T00:00:00.000Z',
             updatedAt: '2021-09-01T00:00:00.000Z',
         },

@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import {
-    createPlaylistMusic,
-    getPlaylistMusics,
-    getPlaylistMusicById,
-    updatePlaylistMusic,
-    deletePlaylistMusic,
+    createPlaylist,
+    getPlaylists,
+    getPlaylistById,
+    updatePlaylist,
+    deletePlaylist,
 } from '../src/controllers/playlist.controller';
 
 jest.mock('@prisma/client', () => {
     const mPrismaClient = {
-        playlistMusic: {
+        playlist: {
             create: jest.fn(),
             findMany: jest.fn(),
             findUnique: jest.fn(),
@@ -46,18 +46,18 @@ describe('Playlist Controller', () => {
         jest.clearAllMocks();
     });
 
-    describe('createPlaylistMusic', () => {
+    describe('createPlaylist', () => {
         it('should create a new playlist music', async () => {
             req.body = { title: 'Test Playlist', userId: 1 };
-            (prisma.playlistMusic.create as jest.Mock).mockResolvedValue({
+            (prisma.playlist.create as jest.Mock).mockResolvedValue({
                 id: 1,
                 title: 'Test Playlist',
                 userId: 1,
             });
 
-            await createPlaylistMusic(req as Request, res as Response);
+            await createPlaylist(req as Request, res as Response);
 
-            expect(prisma.playlistMusic.create).toHaveBeenCalledWith({
+            expect(prisma.playlist.create).toHaveBeenCalledWith({
                 data: { title: 'Test Playlist', userId: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(201);
@@ -70,11 +70,11 @@ describe('Playlist Controller', () => {
 
         it('should handle errors during playlist music creation', async () => {
             req.body = { title: 'Test Playlist', userId: 1 };
-            (prisma.playlistMusic.create as jest.Mock).mockRejectedValue(
+            (prisma.playlist.create as jest.Mock).mockRejectedValue(
                 new Error('Creation error'),
             );
 
-            await createPlaylistMusic(req as Request, res as Response);
+            await createPlaylist(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -84,29 +84,29 @@ describe('Playlist Controller', () => {
         });
     });
 
-    describe('getPlaylistMusics', () => {
+    describe('getPlaylists', () => {
         it('should get all playlist musics', async () => {
             const playlists = [
                 { id: 1, title: 'Playlist 1', userId: 1 },
                 { id: 2, title: 'Playlist 2', userId: 2 },
             ];
-            (prisma.playlistMusic.findMany as jest.Mock).mockResolvedValue(
+            (prisma.playlist.findMany as jest.Mock).mockResolvedValue(
                 playlists,
             );
 
-            await getPlaylistMusics(req as Request, res as Response);
+            await getPlaylists(req as Request, res as Response);
 
-            expect(prisma.playlistMusic.findMany).toHaveBeenCalled();
+            expect(prisma.playlist.findMany).toHaveBeenCalled();
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith(playlists);
         });
 
         it('should handle errors during fetching playlist musics', async () => {
-            (prisma.playlistMusic.findMany as jest.Mock).mockRejectedValue(
+            (prisma.playlist.findMany as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
 
-            await getPlaylistMusics(req as Request, res as Response);
+            await getPlaylists(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -116,17 +116,17 @@ describe('Playlist Controller', () => {
         });
     });
 
-    describe('getPlaylistMusicById', () => {
+    describe('getPlaylistById', () => {
         it('should get a playlist music by ID', async () => {
             req.params = { id: '1' };
             const playlist = { id: 1, title: 'Playlist 1', userId: 1 };
-            (prisma.playlistMusic.findUnique as jest.Mock).mockResolvedValue(
+            (prisma.playlist.findUnique as jest.Mock).mockResolvedValue(
                 playlist,
             );
 
-            await getPlaylistMusicById(req as Request, res as Response);
+            await getPlaylistById(req as Request, res as Response);
 
-            expect(prisma.playlistMusic.findUnique).toHaveBeenCalledWith({
+            expect(prisma.playlist.findUnique).toHaveBeenCalledWith({
                 where: { id: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
@@ -135,11 +135,9 @@ describe('Playlist Controller', () => {
 
         it('should return 404 if playlist music not found', async () => {
             req.params = { id: '1' };
-            (prisma.playlistMusic.findUnique as jest.Mock).mockResolvedValue(
-                null,
-            );
+            (prisma.playlist.findUnique as jest.Mock).mockResolvedValue(null);
 
-            await getPlaylistMusicById(req as Request, res as Response);
+            await getPlaylistById(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(404);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -149,11 +147,11 @@ describe('Playlist Controller', () => {
 
         it('should handle errors during fetching playlist music by ID', async () => {
             req.params = { id: '1' };
-            (prisma.playlistMusic.findUnique as jest.Mock).mockRejectedValue(
+            (prisma.playlist.findUnique as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
 
-            await getPlaylistMusicById(req as Request, res as Response);
+            await getPlaylistById(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -163,7 +161,7 @@ describe('Playlist Controller', () => {
         });
     });
 
-    describe('updatePlaylistMusic', () => {
+    describe('updatePlaylist', () => {
         it('should update a playlist music by ID', async () => {
             req.params = { id: '1' };
             req.body = { title: 'Updated Playlist', userId: 1 };
@@ -172,13 +170,13 @@ describe('Playlist Controller', () => {
                 title: 'Updated Playlist',
                 userId: 1,
             };
-            (prisma.playlistMusic.update as jest.Mock).mockResolvedValue(
+            (prisma.playlist.update as jest.Mock).mockResolvedValue(
                 updatedPlaylist,
             );
 
-            await updatePlaylistMusic(req as Request, res as Response);
+            await updatePlaylist(req as Request, res as Response);
 
-            expect(prisma.playlistMusic.update).toHaveBeenCalledWith({
+            expect(prisma.playlist.update).toHaveBeenCalledWith({
                 where: { id: 1 },
                 data: { title: 'Updated Playlist', userId: 1 },
             });
@@ -189,11 +187,11 @@ describe('Playlist Controller', () => {
         it('should handle errors during updating playlist music', async () => {
             req.params = { id: '1' };
             req.body = { title: 'Updated Playlist', userId: 1 };
-            (prisma.playlistMusic.update as jest.Mock).mockRejectedValue(
+            (prisma.playlist.update as jest.Mock).mockRejectedValue(
                 new Error('Updating error'),
             );
 
-            await updatePlaylistMusic(req as Request, res as Response);
+            await updatePlaylist(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
@@ -203,14 +201,14 @@ describe('Playlist Controller', () => {
         });
     });
 
-    describe('deletePlaylistMusic', () => {
+    describe('deletePlaylist', () => {
         it('should delete a playlist music by ID', async () => {
             req.params = { id: '1' };
-            (prisma.playlistMusic.delete as jest.Mock).mockResolvedValue({});
+            (prisma.playlist.delete as jest.Mock).mockResolvedValue({});
 
-            await deletePlaylistMusic(req as Request, res as Response);
+            await deletePlaylist(req as Request, res as Response);
 
-            expect(prisma.playlistMusic.delete).toHaveBeenCalledWith({
+            expect(prisma.playlist.delete).toHaveBeenCalledWith({
                 where: { id: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(204);
@@ -219,11 +217,11 @@ describe('Playlist Controller', () => {
 
         it('should handle errors during deleting playlist music', async () => {
             req.params = { id: '1' };
-            (prisma.playlistMusic.delete as jest.Mock).mockRejectedValue(
+            (prisma.playlist.delete as jest.Mock).mockRejectedValue(
                 new Error('Deleting error'),
             );
 
-            await deletePlaylistMusic(req as Request, res as Response);
+            await deletePlaylist(req as Request, res as Response);
 
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({

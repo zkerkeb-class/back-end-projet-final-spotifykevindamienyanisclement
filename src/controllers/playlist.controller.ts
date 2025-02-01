@@ -1,19 +1,21 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import {
+    IPlaylist,
+    IPlaylistCreate,
+    IPlaylistFull,
+} from 'src/types/interfaces/playlist.interface';
 
 const prisma = new PrismaClient();
 
-export const createPlaylistMusic = async (req: Request, res: Response) => {
-    const { title, userId } = req.body;
+export const createPlaylist = async (req: Request, res: Response) => {
+    const playlistCreate: IPlaylistCreate = req.body;
 
     try {
-        const playlistMusic = await prisma.playlistMusic.create({
-            data: {
-                title,
-                userId,
-            },
+        const playlist = await prisma.playlist.create({
+            data: playlistCreate,
         });
-        res.status(201).json(playlistMusic);
+        res.status(201).json(playlist);
     } catch (error) {
         res.status(500).json({
             message: 'Error creating playlist music',
@@ -22,10 +24,12 @@ export const createPlaylistMusic = async (req: Request, res: Response) => {
     }
 };
 
-export const getPlaylistMusics = async (req: Request, res: Response) => {
+export const getPlaylists = async (req: Request, res: Response) => {
     try {
-        const playlistMusics = await prisma.playlistMusic.findMany();
-        res.status(200).json(playlistMusics);
+        const playlists: IPlaylist[] = await prisma.playlist.findMany({
+            include: { image: true },
+        });
+        res.status(200).json(playlists);
     } catch (error) {
         res.status(500).json({
             message: 'Error fetching playlist musics',
@@ -34,15 +38,23 @@ export const getPlaylistMusics = async (req: Request, res: Response) => {
     }
 };
 
-export const getPlaylistMusicById = async (req: Request, res: Response) => {
+export const getPlaylistById = async (req: Request, res: Response) => {
     const { id } = req.params;
+    if (!id) res.status(400).json({ message: 'Playlist ID is required' });
 
     try {
-        const playlistMusic = await prisma.playlistMusic.findUnique({
-            where: { id: parseInt(id, 10) },
-        });
-        if (playlistMusic) {
-            res.status(200).json(playlistMusic);
+        const playlist: IPlaylistFull | null = await prisma.playlist.findUnique(
+            {
+                where: { id: parseInt(id, 10) },
+                include: {
+                    image: true,
+                    tracks: { include: { sound: true } },
+                    user: true,
+                },
+            },
+        );
+        if (playlist) {
+            res.status(200).json(playlist);
         } else {
             res.status(404).json({ message: 'Playlist music not found' });
         }
@@ -54,17 +66,20 @@ export const getPlaylistMusicById = async (req: Request, res: Response) => {
     }
 };
 
-export const updatePlaylistMusic = async (req: Request, res: Response) => {
+export const updatePlaylist = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { title, userId } = req.body;
+    const playlistUpdate: IPlaylistCreate = req.body;
+    if (!id) res.status(400).json({ message: 'Playlist ID is required' });
 
     try {
-        const playlistMusic = await prisma.playlistMusic.update({
+        const playlist: IPlaylist = await prisma.playlist.update({
             where: { id: parseInt(id, 10) },
-            data: { title, userId },
+            data: playlistUpdate,
+            include: { image: true },
         });
-        res.status(200).json(playlistMusic);
+        res.status(200).json(playlist);
     } catch (error) {
+        console.log('error updating playlist music', error);
         res.status(500).json({
             message: 'Error updating playlist music',
             error,
@@ -72,15 +87,17 @@ export const updatePlaylistMusic = async (req: Request, res: Response) => {
     }
 };
 
-export const deletePlaylistMusic = async (req: Request, res: Response) => {
+export const deletePlaylist = async (req: Request, res: Response) => {
     const { id } = req.params;
+    if (!id) res.status(400).json({ message: 'Playlist ID is required' });
 
     try {
-        await prisma.playlistMusic.delete({
+        await prisma.playlist.delete({
             where: { id: parseInt(id, 10) },
         });
         res.status(204).send();
     } catch (error) {
+        console.log('error deleting playlist music', error);
         res.status(500).json({
             message: 'Error deleting playlist music',
             error,
