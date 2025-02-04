@@ -38,6 +38,10 @@ const doc = {
             name: 'Artist',
             description: 'Groups related apis',
         },
+        {
+            name: 'User',
+            description: 'User related apis',
+        },
     ],
     securityDefinitions: {
         bearerAuth: {

@@ -41,32 +41,48 @@ router.get(
     authorize([Permissions.READ_TRACK]),
     validateRequest(trackSchema.albumIdParam, 'params'),
     /* #swagger.tags = ['Track']
-       #swagger.description = 'Get all tracks from an album'
+       #swagger.description = 'Get all tracks with pagination'
        #swagger.path = '/album/{albumId}/track'
-       #swagger.responses[200] = { schema: { $ref: '#/definitions/trackRequest' } }
+       #swagger.parameters['limit'] = {
+           in: 'query',
+           required: false,
+           type: 'integer',
+           description: 'Number of tracks to return',
+           example: 10
+       }
+       #swagger.parameters['offset'] = {
+           in: 'query',
+           required: false,
+           type: 'integer',
+           description: 'Number of tracks to skip',
+           example: 0
+       }
+       #swagger.responses[200] = { schema: { $ref: '#/definitions/trackResponse' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
     getTracks,
 );
 
-router.get(
-    '/all',
+const getAllTracksRouter = express.Router();
+
+getAllTracksRouter.get(
+    '/',
     /* #swagger.tags = ['Track']
        #swagger.description = 'Get all tracks'
-       #swagger.path = '/album/{albumId}/track/all'
+       #swagger.path = '/track'
        #swagger.responses[200] = { schema: { $ref: '#/definitions/trackRequest' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
     getAllTracks,
 );
 
-router.get(
+getAllTracksRouter.get(
     '/:trackId',
     authorize([Permissions.READ_TRACK]),
     validateRequest(trackSchema.trackIdParam, 'params'),
     /* #swagger.tags = ['Track']
        #swagger.description = 'Get a track by ID from an album'
-       #swagger.path = '/album/{albumId}/track/{trackId}'
+       #swagger.path = '/track/{trackId}'
        #swagger.parameters['trackId'] = { in: 'path', required: true, type: 'integer', example: 1 }
        #swagger.responses[200] = { schema: { $ref: '#/definitions/trackRequestFull' } }
        #swagger.responses[404] = { schema: { $ref: '#/definitions/errorResponse.404' } }
@@ -75,14 +91,14 @@ router.get(
     getTrack,
 );
 
-router.put(
+getAllTracksRouter.put(
     '/:trackId',
     authorize([Permissions.UPDATE_TRACK]),
     validateRequest(trackSchema.trackIdParam, 'params'),
     validateRequest(trackSchema.update, 'body'),
     /* #swagger.tags = ['Track']
        #swagger.description = 'Update a track by ID in an album'
-       #swagger.path = '/album/{albumId}/track/{trackId}'
+       #swagger.path = '/track/{trackId}'
        #swagger.parameters['trackId'] = { in: 'path', required: true, type: 'integer', example: 1 }
        #swagger.parameters["body"] = {
             in: 'body',
@@ -97,32 +113,19 @@ router.put(
     updateTrack,
 );
 
-router.delete(
+getAllTracksRouter.delete(
     '/:trackId',
     authorize([Permissions.DELETE_TRACK]),
     validateRequest(trackSchema.trackIdParam, 'params'),
     /* #swagger.tags = ['Track']
        #swagger.description = 'Delete a track by ID from an album'
-       #swagger.path = '/album/{albumId}/track/{trackId}'
+       #swagger.path = '/track/{trackId}'
        #swagger.parameters['trackId'] = { in: 'path', required: true, type: 'integer', example: 1 }
        #swagger.responses[204] = { schema: { $ref: '#/definitions/successResponse.204' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
     auditLog('DELETE_TRACK'),
     deleteTrack,
-);
-
-const getAllTracksRouter = express.Router();
-
-getAllTracksRouter.get(
-    '/',
-    /* #swagger.tags = ['Track']
-       #swagger.description = 'Get all tracks'
-       #swagger.path = '/tracks'
-       #swagger.responses[200] = { schema: { $ref: '#/definitions/trackRequest' } }
-       #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
-    */
-    getAllTracks,
 );
 
 export { getAllTracksRouter as default, router };

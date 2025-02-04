@@ -1,3 +1,5 @@
+import { P } from 'pino';
+
 export const Roles = {
     ADMIN: 'ADMIN',
     USER: 'USER',
@@ -9,6 +11,7 @@ export const Permissions = {
     READ_USER: 'read_user',
     UPDATE_USER: 'update_user',
     DELETE_USER: 'delete_user',
+    READ_CURRENT_USER: 'read_current_user',
 
     CREATE_ALBUM: 'create_album',
     READ_ALBUM: 'read_album',
@@ -78,14 +81,31 @@ export const RolePermissions = {
 
         Permissions.READ_GROUP,
 
-        Permissions.CREATE_PLAYLIST,
         Permissions.READ_PLAYLIST,
-        Permissions.UPDATE_PLAYLIST,
-        Permissions.DELETE_PLAYLIST,
 
         Permissions.READ_TRACK,
 
         Permissions.UPLOAD_FILE,
     ],
-    [Roles.USER]: [Permissions.READ_SOUND],
+    [Roles.USER]: [
+        Permissions.READ_USER,
+
+        Permissions.READ_ALBUM,
+
+        Permissions.READ_ARTIST,
+
+        Permissions.READ_GROUP,
+
+        Permissions.READ_PLAYLIST,
+
+        Permissions.READ_TRACK,
+
+        Permissions.UPLOAD_FILE,
+
+        Permissions.READ_SOUND,
+        Permissions.CREATE_PLAYLIST,
+        Permissions.UPDATE_PLAYLIST,
+        Permissions.DELETE_PLAYLIST,
+        Permissions.READ_CURRENT_USER,
+    ],
 };

@@ -20,7 +20,7 @@ export const createGroup = async (req: Request, res: Response) => {
 
         res.status(201).json(group);
     } catch (error) {
-        logger.error('error creating artist group', error);
+        logger.error('error creating artist group' + error);
         res.status(500).json({ message: 'Error creating artist group', error });
     }
 };
@@ -32,7 +32,7 @@ export const getGroups = async (req: Request, res: Response) => {
         });
         res.status(200).json(groups);
     } catch (error) {
-        logger.error('error fetching artist groups', error);
+        logger.error('error fetching artist groups' + error);
         res.status(500).json({
             message: 'Error fetching artist groups',
             error,
@@ -61,7 +61,7 @@ export const getGroupById = async (req: Request, res: Response) => {
             res.status(404).json({ message: 'Artist group not found' });
         }
     } catch (error) {
-        logger.error('error fetching artist group', error);
+        logger.error('error fetching artist group' + error);
         res.status(500).json({ message: 'Error fetching artist group', error });
     }
 };
@@ -80,7 +80,7 @@ export const updateGroup = async (req: Request, res: Response) => {
         });
         res.status(200).json(group);
     } catch (error) {
-        logger.error('error updating artist group', error);
+        logger.error('error updating artist group' + error);
         res.status(500).json({ message: 'Error updating artist group', error });
     }
 };
@@ -95,7 +95,7 @@ export const deleteGroup = async (req: Request, res: Response) => {
         });
         res.status(204).send();
     } catch (error) {
-        logger.error('error deleting artist group', error);
+        logger.error('error deleting artist group' + error);
         res.status(500).json({ message: 'Error deleting artist group', error });
     }
 };

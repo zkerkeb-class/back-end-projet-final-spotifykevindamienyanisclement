@@ -30,6 +30,10 @@
     {
       "name": "Artist",
       "description": "Groups related apis"
+    },
+    {
+      "name": "User",
+      "description": "User related apis"
     }
   ],
   "schemes": [
@@ -203,7 +207,25 @@
         "tags": [
           "Artist"
         ],
-        "description": "Get all artists",
+        "description": "Get all artists with pagination",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of artists to return",
+            "example": 10
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of artists to skip",
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -323,6 +345,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error",
             "schema": {
@@ -380,7 +405,25 @@
         "tags": [
           "Album"
         ],
-        "description": "Get all music albums",
+        "description": "Get all music albums with pagination",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to return",
+            "example": 10
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to skip",
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -569,6 +612,68 @@
             "description": "Internal Server Error",
             "schema": {
               "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/playlist/last-listened": {
+      "get": {
+        "tags": [
+          "Playlist"
+        ],
+        "description": "Get the last 20 listened tracks",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/trackRequest"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Erreur lors de la récupération des derniers titres écoutés"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/playlist/most-listened": {
+      "get": {
+        "tags": [
+          "Playlist"
+        ],
+        "description": "Get the top 20 most listened tracks",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/trackRequest"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Erreur lors de la récupération des titres les plus écoutés"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
             }
           }
         }
@@ -1155,20 +1260,36 @@
         "tags": [
           "Track"
         ],
-        "description": "Get all tracks from an album",
+        "description": "Get all tracks with pagination",
         "parameters": [
           {
             "name": "albumId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of tracks to return",
+            "example": 10
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of tracks to skip",
+            "example": 0
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/trackRequest"
+              "$ref": "#/definitions/trackResponse"
             }
           },
           "400": {
@@ -1183,7 +1304,7 @@
         }
       }
     },
-    "/album/{albumId}/track/all": {
+    "/track": {
       "get": {
         "tags": [
           "Track"
@@ -1191,9 +1312,13 @@
         "description": "Get all tracks",
         "parameters": [
           {
-            "name": "albumId",
-            "in": "path",
-            "required": true,
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
             "type": "string"
           }
         ],
@@ -1213,19 +1338,13 @@
         }
       }
     },
-    "/album/{albumId}/track/{trackId}": {
+    "/track/{trackId}": {
       "get": {
         "tags": [
           "Track"
         ],
         "description": "Get a track by ID from an album",
         "parameters": [
-          {
-            "name": "albumId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "trackId",
             "in": "path",
@@ -1264,12 +1383,6 @@
         ],
         "description": "Update a track by ID in an album",
         "parameters": [
-          {
-            "name": "albumId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "trackId",
             "in": "path",
@@ -1311,12 +1424,6 @@
         "description": "Delete a track by ID from an album",
         "parameters": [
           {
-            "name": "albumId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "trackId",
             "in": "path",
             "required": true,
@@ -1343,28 +1450,6 @@
         }
       }
     },
-    "/tracks": {
-      "get": {
-        "tags": [
-          "Track"
-        ],
-        "description": "Get all tracks",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/trackRequest"
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "$ref": "#/definitions/errorResponse.500"
-            }
-          }
-        }
-      }
-    },
     "/album/{albumId}/track/{{where{id}": {
       "delete": {
         "description": "",
@@ -1376,6 +1461,256 @@
       }
     },
     "/tracks/{{where{id}": {
+      "delete": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/user": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "description": "Create a new user",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/successResponse.201"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Get all user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/userResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/user/me": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Get current user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/userResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            },
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Get a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/userResponseFull"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.400"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.404"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "description": "Update a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/userResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "description": "Delete a user by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "schema": {
+              "$ref": "#/definitions/successResponse.204"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/user/track/{trackId}/read": {
+      "post": {
+        "tags": [
+          "Track"
+        ],
+        "description": "Mark a track as read by a user",
+        "parameters": [
+          {
+            "name": "trackId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Track marqué comme lu"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Track non trouvé"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Erreur lors du marquage du track comme lu"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{{where{id:parseInt(id}": {
       "delete": {
         "description": "",
         "responses": {

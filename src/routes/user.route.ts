@@ -5,6 +5,8 @@ import {
     getUserById,
     updateUser,
     deleteUser,
+    getCurrentUser,
+    markTrackAsRead,
 } from '../controllers/user.controller';
 import { validateRequest } from '../middlewares/validateRequest';
 import { userSchema } from '../schemas/user.schema';
@@ -20,7 +22,7 @@ router.post(
     validateRequest(userSchema.create, 'body'),
     /* #swagger.tags = ['User']
        #swagger.description = 'Create a new user'
-       #swagger.path = '/users'
+       #swagger.path = '/user'
        #swagger.body = {
            required: true,
            content: {
@@ -47,12 +49,24 @@ router.get(
     '/',
     authorize([Permissions.READ_USER]),
     /* #swagger.tags = ['User']
-       #swagger.description = 'Get all users'
-       #swagger.path = '/users'
+       #swagger.description = 'Get all user'
+       #swagger.path = '/user'
        #swagger.responses[200] = { schema: { $ref: '#/definitions/userResponse' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
     getUsers,
+);
+
+router.get(
+    '/me',
+    authorize([Permissions.READ_CURRENT_USER]),
+    /* #swagger.tags = ['User']
+       #swagger.description = 'Get current user'
+       #swagger.path = '/user/me'
+       #swagger.responses[200] = { schema: { $ref: '#/definitions/userResponse' } }
+       #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
+    */
+    getCurrentUser,
 );
 
 router.get(
@@ -61,7 +75,7 @@ router.get(
     validateRequest(userSchema.idParam, 'params'),
     /* #swagger.tags = ['User']
        #swagger.description = 'Get a user by ID'
-       #swagger.path = '/users/{id}'
+       #swagger.path = '/user/{id}'
        #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer', example: 1 }
        #swagger.responses[200] = { schema: { $ref: '#/definitions/userResponseFull' } }
        #swagger.responses[400] = { schema: { $ref: '#/definitions/errorResponse.400' } }
@@ -78,7 +92,7 @@ router.put(
     validateRequest(userSchema.update, 'body'),
     /* #swagger.tags = ['User']
        #swagger.description = 'Update a user by ID'
-       #swagger.path = '/users/{id}'
+       #swagger.path = '/user/{id}'
        #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer', example: 1 }
        #swagger.body = {
            required: true,
@@ -108,13 +122,26 @@ router.delete(
     validateRequest(userSchema.idParam, 'params'),
     /* #swagger.tags = ['User']
        #swagger.description = 'Delete a user by ID'
-       #swagger.path = '/users/{id}'
+       #swagger.path = '/user/{id}'
        #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer', example: 1 }
        #swagger.responses[204] = { schema: { $ref: '#/definitions/successResponse.204' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
     auditLog('DELETE_USER'),
     deleteUser,
+);
+
+router.post(
+    '/track/:trackId/read',
+    authorize([Permissions.READ_TRACK]),
+    /* #swagger.tags = ['Track']
+       #swagger.description = 'Mark a track as read by a user'
+       #swagger.path = '/user/track/{trackId}/read'
+       #swagger.responses[201] = { schema: { message: 'Track marqué comme lu' } }
+       #swagger.responses[404] = { schema: { error: 'Track non trouvé' } }
+       #swagger.responses[500] = { schema: { error: 'Erreur lors du marquage du track comme lu' } }
+    */
+    markTrackAsRead,
 );
 
 export default router;

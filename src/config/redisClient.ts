@@ -11,7 +11,7 @@ if (process.env.INSTALL_REDIS === 'true') {
     });
 
     redisClient.on('error', (error) => {
-        logger.error('Redis error: ', error);
+        logger.error('Redis error: ' + error);
     });
 }
 

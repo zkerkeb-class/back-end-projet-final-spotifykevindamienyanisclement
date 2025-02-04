@@ -80,7 +80,7 @@ export const updatePlaylist = async (req: Request, res: Response) => {
         });
         res.status(200).json(playlist);
     } catch (error) {
-        logger.error('error updating playlist music', error);
+        logger.error('error updating playlist music' + error);
         res.status(500).json({
             message: 'Error updating playlist music',
             error,
@@ -98,7 +98,7 @@ export const deletePlaylist = async (req: Request, res: Response) => {
         });
         res.status(204).send();
     } catch (error) {
-        logger.error('error deleting playlist music', error);
+        logger.error('error deleting playlist music' + error);
         res.status(500).json({
             message: 'Error deleting playlist music',
             error,
@@ -125,7 +125,7 @@ export const addTrackToPlaylist = async (req: Request, res: Response) => {
         });
         res.status(200).json(playlist);
     } catch (error) {
-        logger.error('error adding track to playlist music', error);
+        logger.error('error adding track to playlist music' + error);
         res.status(500).json({
             message: 'Error adding track to playlist music',
             error,
@@ -152,10 +152,89 @@ export const removeTrackFromPlaylist = async (req: Request, res: Response) => {
         });
         res.status(200).json(playlist);
     } catch (error) {
-        logger.error('error removing track from playlist music', error);
+        logger.error('error removing track from playlist music' + error);
         res.status(500).json({
             message: 'Error removing track from playlist music',
             error,
+        });
+    }
+};
+
+export const getLastListenedTracks = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const userId = req.user.id;
+
+        const tracks = await prisma.trackRead.findMany({
+            where: {
+                userId,
+            },
+            include: {
+                track: {
+                    include: {
+                        album: true,
+                        artist: true,
+                    },
+                },
+            },
+            distinct: ['trackId'], // Filtrer les doublons par le champ `trackId`
+            orderBy: {
+                createdAt: 'desc',
+            },
+            take: 20,
+        });
+
+        res.json(tracks);
+    } catch (error) {
+        console.error(
+            'Erreur lors de la récupération des derniers titres écoutés',
+            error,
+        );
+        res.status(500).json({
+            error: 'Erreur lors de la récupération des derniers titres écoutés',
+        });
+    }
+};
+
+export const getMostListenedTracks = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const tracks = await prisma.trackRead.groupBy({
+            by: ['trackId'],
+            _count: {
+                trackId: true,
+            },
+            orderBy: {
+                _count: {
+                    trackId: 'desc',
+                },
+            },
+            take: 20,
+        });
+
+        const trackIds = tracks.map((track) => track.trackId);
+        const mostListenedTracks = await prisma.track.findMany({
+            where: {
+                id: { in: trackIds },
+            },
+            include: {
+                album: true,
+                artist: true,
+            },
+        });
+
+        res.status(200).json(mostListenedTracks);
+    } catch (error) {
+        logger.error(
+            'Erreur lors de la récupération des titres les plus écoutés',
+            error,
+        );
+        res.status(500).json({
+            error: 'Erreur lors de la récupération des titres les plus écoutés',
         });
     }
 };

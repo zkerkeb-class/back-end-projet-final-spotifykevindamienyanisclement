@@ -50,7 +50,7 @@ export const register = async (req: Request, res: Response) => {
             token,
         });
     } catch (error) {
-        logger.error('Error registering user:', error);
+        logger.error('Error registering user:' + error);
         res.status(500).json({
             message: 'Error registering user',
             error: error instanceof Error ? error.message : String(error),
@@ -94,7 +94,7 @@ export const login = async (req: Request, res: Response) => {
 
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
-        logger.error('Error logging in:', error);
+        logger.error('Error logging in:' + error);
         res.status(500).json({
             message: 'Error logging in',
             error: error instanceof Error ? error.message : String(error),

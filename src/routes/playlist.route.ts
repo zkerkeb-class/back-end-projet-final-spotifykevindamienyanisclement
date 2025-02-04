@@ -6,6 +6,8 @@ import {
     updatePlaylist,
     deletePlaylist,
     addTrackToPlaylist,
+    getLastListenedTracks,
+    getMostListenedTracks,
 } from '../controllers/playlist.controller';
 import { playlistSchema } from '../schemas/playlist.schema';
 import { validateRequest } from '../middlewares/validateRequest';
@@ -43,6 +45,28 @@ router.get(
        #swagger.responses[200] = { schema: { $ref: '#/definitions/playlistRequest' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
+);
+
+router.get(
+    '/last-listened',
+    authorize([Permissions.READ_TRACK]),
+    /* #swagger.tags = ['Playlist']
+       #swagger.description = 'Get the last 20 listened tracks'
+       #swagger.responses[200] = { schema: { $ref: '#/definitions/trackRequest' } }
+       #swagger.responses[500] = { schema: { error: 'Erreur lors de la récupération des derniers titres écoutés' } }
+    */
+    getLastListenedTracks,
+);
+
+router.get(
+    '/most-listened',
+    authorize([Permissions.READ_TRACK]),
+    /* #swagger.tags = ['Playlist']
+       #swagger.description = 'Get the top 20 most listened tracks'
+       #swagger.responses[200] = { schema: { $ref: '#/definitions/trackRequest' } }
+       #swagger.responses[500] = { schema: { error: 'Erreur lors de la récupération des titres les plus écoutés' } }
+    */
+    getMostListenedTracks,
 );
 
 router.get(

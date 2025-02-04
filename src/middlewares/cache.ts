@@ -36,7 +36,7 @@ const cacheMiddleware = async (
         next();
     } catch (error) {
         // En cas d'erreur, l'enregistrer et passer au middleware suivant
-        logger.error('Cache middleware error:', error);
+        logger.error('Cache middleware error:' + error);
         next();
     }
 };

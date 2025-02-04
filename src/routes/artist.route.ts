@@ -39,8 +39,22 @@ router.get(
     '/',
     authorize([Permissions.READ_ARTIST]),
     /* #swagger.tags = ['Artist']
-       #swagger.description = 'Get all artists'
+       #swagger.description = 'Get all artists with pagination'
        #swagger.path = '/artist'
+       #swagger.parameters['limit'] = {
+           in: 'query',
+           required: false,
+           type: 'integer',
+           description: 'Number of artists to return',
+           example: 10
+       }
+       #swagger.parameters['offset'] = {
+           in: 'query',
+           required: false,
+           type: 'integer',
+           description: 'Number of artists to skip',
+           example: 0
+       }
        #swagger.responses[200] = { schema: { $ref: '#/definitions/artistResponse' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */

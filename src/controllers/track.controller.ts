@@ -36,7 +36,7 @@ export const createTrack = async (req: Request, res: Response) => {
 
         res.status(201).json(track);
     } catch (error) {
-        logger.error('error happened in create track', error);
+        logger.error('error happened in create track' + error);
         res.status(500).json({
             error: 'Erreur lors de la création du track',
         });
@@ -44,8 +44,10 @@ export const createTrack = async (req: Request, res: Response) => {
 };
 
 export const getAllTracks = async (req: Request, res: Response) => {
+    const { limit = 10, offset = 0 } = req.query;
+
     try {
-        const tracks = await prisma.track.findMany({
+        const tracks: any[] = await prisma.track.findMany({
             include: {
                 sound: true,
                 album: {
@@ -64,45 +66,37 @@ export const getAllTracks = async (req: Request, res: Response) => {
                     },
                 },
             },
+            take: Number(limit),
+            skip: Number(offset),
         });
 
-        res.json(tracks);
+        res.status(200).json(tracks);
     } catch (error) {
-        console.error('error happened in find all tracks', error);
-        res.status(500).json({
-            error: 'Erreur lors de la récupération des tracks',
-        });
+        logger.error('error fetching all tracks' + error);
+        res.status(500).json({ message: 'Error fetching all tracks', error });
     }
 };
 
 export const getTracks = async (req: Request, res: Response) => {
-    try {
-        const albumId = parseInt(req.params.albumId);
-        const tracks = await prisma.track.findMany({
-            where: {
-                albumId,
-            },
-            include: {
-                sound: true,
-                // album: true,
-                // artist: true,
-            },
-        });
+    const { limit = 10, offset = 0 } = req.query;
 
-        res.json(tracks);
-    } catch (error) {
-        logger.error('error happened in find all tracks', error);
-        res.status(500).json({
-            error: 'Erreur lors de la récupération des tracks',
+    try {
+        const tracks: any[] = await prisma.track.findMany({
+            include: { sound: true, album: true, artist: true },
+            take: Number(limit),
+            skip: Number(offset),
         });
+        res.status(200).json(tracks);
+    } catch (error) {
+        logger.error('error fetching tracks' + error);
+        res.status(500).json({ message: 'Error fetching tracks', error });
     }
 };
 
 export const getTrack = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.trackId);
-        const albumId = parseInt(req.params.albumId);
-        if (!id || !albumId) {
+        if (!id) {
             res.status(400).json({
                 error: 'Track ID and Album ID are required',
             });
@@ -112,7 +106,6 @@ export const getTrack = async (req: Request, res: Response) => {
         const track = await prisma.track.findFirst({
             where: {
                 id,
-                albumId,
             },
             include: {
                 sound: true,
@@ -129,7 +122,7 @@ export const getTrack = async (req: Request, res: Response) => {
 
         res.json(track);
     } catch (error) {
-        logger.error('error happened in find one track', error);
+        logger.error('error happened in find one track' + error);
         res.status(500).json({
             error: 'Erreur lors de la récupération du track',
         });
@@ -139,13 +132,11 @@ export const getTrack = async (req: Request, res: Response) => {
 export const updateTrack = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.trackId);
-        const albumId = parseInt(req.params.albumId);
         const data: Partial<ITrackCreate> = req.body;
 
         const track = await prisma.track.update({
             where: {
                 id,
-                albumId,
             },
             data,
             include: {
@@ -158,7 +149,7 @@ export const updateTrack = async (req: Request, res: Response) => {
 
         res.json(track);
     } catch (error) {
-        logger.error('error happened in update track', error);
+        logger.error('error happened in update track' + error);
         res.status(500).json({
             error: 'Erreur lors de la mise à jour du track',
         });
@@ -168,18 +159,16 @@ export const updateTrack = async (req: Request, res: Response) => {
 export const deleteTrack = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.trackId);
-        const albumId = parseInt(req.params.albumId);
 
         await prisma.track.delete({
             where: {
                 id,
-                albumId,
             },
         });
 
         res.status(204).send();
     } catch (error) {
-        logger.error('error happened in delete track', error);
+        logger.error('error happened in delete track' + error);
         res.status(500).json({
             error: 'Erreur lors de la suppression du track',
         });

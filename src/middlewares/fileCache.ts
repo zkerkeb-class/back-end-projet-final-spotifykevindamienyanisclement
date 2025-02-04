@@ -46,7 +46,7 @@ const fileCacheMiddleware = async (
         next();
     } catch (error) {
         // En cas d'erreur, l'enregistrer et passer au middleware suivant
-        logger.error('File cache middleware error:', error);
+        logger.error('File cache middleware error:' + error);
         next();
     }
 };
