@@ -3,9 +3,12 @@ import authRoute from './auth.route';
 import artistRoute from './artist.route';
 import albumRoute from './album.route';
 import playlistRoute from './playlist.route';
-import groupRoute from './group';
+import groupRoute from './group.route';
 import uploadRoute from './upload.route';
 import trackRoute from './track.route';
+import getAllTracks from './track.route';
+
+import verifyToken from '../middlewares/verifyToken';
 
 const router = express.Router({ mergeParams: true });
 
@@ -21,6 +24,46 @@ const router = express.Router({ mergeParams: true });
  *         description: Auth resource
  */
 router.use('/auth', authRoute);
+
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Authentifier un utilisateur
+ *     description: Connecte un utilisateur et renvoie un token JWT
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/definitions/loginRequest'
+ *     responses:
+ *       200:
+ *         description: Authentification réussie
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/loginResponse'
+ *       400:
+ *         description: Données invalides
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/errorResponse.400'
+ *       401:
+ *         description: Authentification échouée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/definitions/errorResponse.401'
+ */
+router.use('/auth', authRoute);
+
+// Application du middleware verifyToken pour toutes les routes protégées
+router.use(verifyToken);
 
 /**
  * @swagger
@@ -99,5 +142,18 @@ router.use('/upload', uploadRoute);
  *         description: Tracks resource
  */
 router.use('/album/:albumId/track', trackRoute);
+
+/**
+ * @swagger
+ * /tracks:
+ *   get:
+ *     tags:
+ *       - Track
+ *     summary: Get all tracks
+ *     responses:
+ *       200:
+ *         description: All tracks
+ */
+router.use('/tracks', getAllTracks);
 
 export default router;

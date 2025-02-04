@@ -7,8 +7,17 @@ declare module 'express' {
     }
 }
 
-declare module 'express-serve-static-core' {
-    interface Request {
-        user?: string | JwtPayload;
+declare global {
+    namespace Express {
+        interface Request {
+            user?:
+                | {
+                      userId: number;
+                      name: string;
+                      email: string;
+                      role: string;
+                  }
+                | JwtPayload;
+        }
     }
 }

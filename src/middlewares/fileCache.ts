@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import redisClient from '../conf/redisClient';
+import redisClient from '../config/redisClient';
 import fs from 'fs';
 import path from 'path';
+import logger from '../config/logger';
 
 const fileCacheMiddleware = async (
     req: Request,
@@ -45,7 +46,7 @@ const fileCacheMiddleware = async (
         next();
     } catch (error) {
         // En cas d'erreur, l'enregistrer et passer au middleware suivant
-        console.error('File cache middleware error:', error);
+        logger.error('File cache middleware error:', error);
         next();
     }
 };

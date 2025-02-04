@@ -1,7 +1,6 @@
 import multer from 'multer';
 import path from 'path';
-const sharp = require('sharp');
-const fs = require('fs');
+import logger from '../config/logger';
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -20,8 +19,8 @@ function checkFileType(file: any, cb: any, filetypes: any) {
         path.extname(file.originalname).toLowerCase(),
     );
     const mimetype = filetypes.test(file.mimetype);
-    console.log('filetypes', filetypes);
-    console.log('mimetype', file.mimetype);
+    logger.info('filetypes', filetypes);
+    logger.info('mimetype', file.mimetype);
 
     if (mimetype && extname) {
         return cb(null, true);

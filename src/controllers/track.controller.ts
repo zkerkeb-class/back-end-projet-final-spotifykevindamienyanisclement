@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { ITrackCreate } from '../types/interfaces/track.interface';
+import logger from '../config/logger';
 
 const prisma = new PrismaClient();
 
 export const createTrack = async (req: Request, res: Response) => {
     try {
         const albumId = parseInt(req.params.albumId);
-        console.log(req.query);
         if (!albumId) {
             res.status(400).json({ error: 'Album ID is required' });
             return;
@@ -25,6 +25,7 @@ export const createTrack = async (req: Request, res: Response) => {
                 ...data,
                 albumId,
                 artistId: album?.artistId,
+                groupId: album?.groupId,
             },
             include: {
                 sound: true,
@@ -35,9 +36,41 @@ export const createTrack = async (req: Request, res: Response) => {
 
         res.status(201).json(track);
     } catch (error) {
-        console.error('error happened in create track', error);
+        logger.error('error happened in create track', error);
         res.status(500).json({
             error: 'Erreur lors de la création du track',
+        });
+    }
+};
+
+export const getAllTracks = async (req: Request, res: Response) => {
+    try {
+        const tracks = await prisma.track.findMany({
+            include: {
+                sound: true,
+                album: {
+                    include: {
+                        image: true,
+                    },
+                },
+                artist: {
+                    include: {
+                        image: true,
+                    },
+                },
+                group: {
+                    include: {
+                        image: true,
+                    },
+                },
+            },
+        });
+
+        res.json(tracks);
+    } catch (error) {
+        console.error('error happened in find all tracks', error);
+        res.status(500).json({
+            error: 'Erreur lors de la récupération des tracks',
         });
     }
 };
@@ -58,7 +91,7 @@ export const getTracks = async (req: Request, res: Response) => {
 
         res.json(tracks);
     } catch (error) {
-        console.error('error happened in find all tracks', error);
+        logger.error('error happened in find all tracks', error);
         res.status(500).json({
             error: 'Erreur lors de la récupération des tracks',
         });
@@ -85,6 +118,7 @@ export const getTrack = async (req: Request, res: Response) => {
                 sound: true,
                 album: true,
                 artist: true,
+                group: true,
             },
         });
 
@@ -95,7 +129,7 @@ export const getTrack = async (req: Request, res: Response) => {
 
         res.json(track);
     } catch (error) {
-        console.error('error happened in find one track', error);
+        logger.error('error happened in find one track', error);
         res.status(500).json({
             error: 'Erreur lors de la récupération du track',
         });
@@ -118,12 +152,13 @@ export const updateTrack = async (req: Request, res: Response) => {
                 sound: true,
                 album: true,
                 artist: true,
+                group: true,
             },
         });
 
         res.json(track);
     } catch (error) {
-        console.error('error happened in update track', error);
+        logger.error('error happened in update track', error);
         res.status(500).json({
             error: 'Erreur lors de la mise à jour du track',
         });
@@ -144,7 +179,7 @@ export const deleteTrack = async (req: Request, res: Response) => {
 
         res.status(204).send();
     } catch (error) {
-        console.error('error happened in delete track', error);
+        logger.error('error happened in delete track', error);
         res.status(500).json({
             error: 'Erreur lors de la suppression du track',
         });

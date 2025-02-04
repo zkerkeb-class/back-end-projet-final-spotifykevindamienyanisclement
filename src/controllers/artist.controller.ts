@@ -5,6 +5,7 @@ import {
     IArtistCreate,
     IArtistFull,
 } from 'src/types/interfaces/artist.interface';
+import logger from '../config/logger';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ export const createArtist = async (req: Request, res: Response) => {
         });
         res.status(201).json(artist);
     } catch (error) {
-        console.log('error creating artist', error);
+        logger.error('error creating artist', error);
         res.status(500).json({ message: 'Error creating artist', error });
     }
 };
@@ -30,7 +31,7 @@ export const getArtists = async (req: Request, res: Response) => {
         });
         res.status(200).json(artists);
     } catch (error) {
-        console.log('error fetching artists', error);
+        logger.error('error fetching artists', error);
         res.status(500).json({ message: 'Error fetching artists', error });
     }
 };
@@ -57,7 +58,7 @@ export const getArtistById = async (req: Request, res: Response) => {
             res.status(404).json({ message: 'Artist not found' });
         }
     } catch (error) {
-        console.log('error fetching artist', error);
+        logger.error('error fetching artist', error);
         res.status(500).json({ message: 'Error fetching artist', error });
     }
 };
@@ -76,7 +77,7 @@ export const updateArtist = async (req: Request, res: Response) => {
         });
         res.status(200).json(artist);
     } catch (error) {
-        console.log('error updating artist', error);
+        logger.error('error updating artist', error);
         res.status(500).json({ message: 'Error updating artist', error });
     }
 };
@@ -92,7 +93,7 @@ export const deleteArtist = async (req: Request, res: Response) => {
         });
         res.status(204).send();
     } catch (error) {
-        console.log('error deleting artist', error);
+        logger.error('error deleting artist', error);
         res.status(500).json({ message: 'Error deleting artist', error });
     }
 };

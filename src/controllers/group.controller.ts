@@ -5,6 +5,7 @@ import {
     IGroup,
     IGroupFull,
 } from 'src/types/interfaces/group.interface';
+import logger from '../config/logger';
 
 const prisma = new PrismaClient();
 
@@ -19,7 +20,7 @@ export const createGroup = async (req: Request, res: Response) => {
 
         res.status(201).json(group);
     } catch (error) {
-        console.log('error creating artist group', error);
+        logger.error('error creating artist group', error);
         res.status(500).json({ message: 'Error creating artist group', error });
     }
 };
@@ -31,7 +32,7 @@ export const getGroups = async (req: Request, res: Response) => {
         });
         res.status(200).json(groups);
     } catch (error) {
-        console.log('error fetching artist groups', error);
+        logger.error('error fetching artist groups', error);
         res.status(500).json({
             message: 'Error fetching artist groups',
             error,
@@ -60,7 +61,7 @@ export const getGroupById = async (req: Request, res: Response) => {
             res.status(404).json({ message: 'Artist group not found' });
         }
     } catch (error) {
-        console.log('error fetching artist group', error);
+        logger.error('error fetching artist group', error);
         res.status(500).json({ message: 'Error fetching artist group', error });
     }
 };
@@ -79,7 +80,7 @@ export const updateGroup = async (req: Request, res: Response) => {
         });
         res.status(200).json(group);
     } catch (error) {
-        console.log('error updating artist group', error);
+        logger.error('error updating artist group', error);
         res.status(500).json({ message: 'Error updating artist group', error });
     }
 };
@@ -94,7 +95,36 @@ export const deleteGroup = async (req: Request, res: Response) => {
         });
         res.status(204).send();
     } catch (error) {
-        console.log('error deleting artist group', error);
+        logger.error('error deleting artist group', error);
         res.status(500).json({ message: 'Error deleting artist group', error });
+    }
+};
+
+export const addArtistToGroup = async (req: Request, res: Response) => {
+    try {
+        const { id, artistId } = req.params;
+        // Logique pour ajouter l'artiste au groupe
+        res.status(200).json({
+            success: true,
+            message: 'Artist added to group successfully',
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to add artist to group',
+        });
+    }
+};
+
+export const removeArtistFromGroup = async (req: Request, res: Response) => {
+    try {
+        const { id, artistId } = req.params;
+        // Logique pour supprimer l'artiste du groupe
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to remove artist from group',
+        });
     }
 };

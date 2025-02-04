@@ -1,13 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import logger from '../config/logger';
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+// Déclaration pour étendre l'interface Request
+declare global {
+    namespace Express {
+        interface Request {
+            user?: any;
+        }
+    }
+}
+
+const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
+    console.log(req.header('Authorization'));
     const token = req.header('Authorization')?.split(' ')[1];
 
     if (!token) {
-        return res
-            .status(401)
-            .json({ message: 'Access denied. No token provided.' });
+        req.user = {
+            role: 'ANONYMOUS',
+        };
+        return next();
     }
 
     try {

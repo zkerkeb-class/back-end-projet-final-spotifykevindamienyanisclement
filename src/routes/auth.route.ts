@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
 import { register, login } from '../controllers/auth.controller';
+import { authSchema } from '../schemas/auth.schema';
+import { validateRequest } from '../middlewares/validateRequest';
 
 const router = express.Router();
 
@@ -26,9 +28,8 @@ router.post(
        #swagger.responses[201] = { schema: { $ref: '#/definitions/successResponse.201' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
-    (req: Request, res: Response) => {
-        register(req, res);
-    },
+    validateRequest(authSchema.register, 'body'),
+    register,
 );
 
 router.post(
@@ -54,9 +55,8 @@ router.post(
        #swagger.responses[401] = { schema: { $ref: '#/definitions/errorResponse.401' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
-    (req: Request, res: Response) => {
-        login(req, res);
-    },
+    validateRequest(authSchema.login, 'body'),
+    login,
 );
 
 router.get(
@@ -66,6 +66,7 @@ router.get(
        #swagger.path = '/auth'
        #swagger.responses[200] = { schema: { $ref: '#/definitions/successResponse.200' } }
     */
+    validateRequest(authSchema.empty, 'query'),
     (req: Request, res: Response) => {
         res.send('respond with a resource');
     },

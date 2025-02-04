@@ -6,11 +6,18 @@ import {
     updateArtist,
     deleteArtist,
 } from '../controllers/artist.controller';
+import { artistSchema } from '../schemas/artist.schema';
+import { validateRequest } from '../middlewares/validateRequest';
+import authorize from '../middlewares/authorize';
+import { Permissions } from '../config/roles';
+import { auditLog } from '../middlewares/auditLog';
 
 const router = express.Router();
 
 router.post(
     '/',
+    authorize([Permissions.CREATE_ARTIST]),
+    validateRequest(artistSchema.create, 'body'),
     /* #swagger.tags = ['Artist']
        #swagger.description = 'Create a new artist'
        #swagger.path = '/artist'
@@ -23,11 +30,14 @@ router.post(
        #swagger.responses[201] = { schema: { $ref: '#/definitions/successResponse.201' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
+    auditLog('CREATE_ARTIST'),
+
     createArtist,
 );
 
 router.get(
     '/',
+    authorize([Permissions.READ_ARTIST]),
     /* #swagger.tags = ['Artist']
        #swagger.description = 'Get all artists'
        #swagger.path = '/artist'
@@ -39,6 +49,8 @@ router.get(
 
 router.get(
     '/:id',
+    authorize([Permissions.READ_ARTIST]),
+    validateRequest(artistSchema.idParam, 'params'),
     /* #swagger.tags = ['Artist']
        #swagger.description = 'Get an artist by ID'
        #swagger.path = '/artist/{id}'
@@ -52,6 +64,9 @@ router.get(
 
 router.put(
     '/:id',
+    authorize([Permissions.UPDATE_ARTIST]),
+    validateRequest(artistSchema.idParam, 'params'),
+    validateRequest(artistSchema.update, 'body'),
     /* #swagger.tags = ['Artist']
        #swagger.description = 'Update an artist by ID'
        #swagger.path = '/artist/{id}'
@@ -65,11 +80,14 @@ router.put(
        #swagger.responses[200] = { schema: { $ref: '#/definitions/successResponse.200' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
+    auditLog('UPDATE_ARTIST'),
     updateArtist,
 );
 
 router.delete(
     '/:id',
+    authorize([Permissions.DELETE_ARTIST]),
+    validateRequest(artistSchema.idParam, 'params'),
     /* #swagger.tags = ['Artist']
        #swagger.description = 'Delete an artist by ID'
        #swagger.path = '/artist/{id}'
@@ -77,6 +95,7 @@ router.delete(
        #swagger.responses[204] = { schema: { $ref: '#/definitions/successResponse.204' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
+    auditLog('DELETE_ARTIST'),
     deleteArtist,
 );
 

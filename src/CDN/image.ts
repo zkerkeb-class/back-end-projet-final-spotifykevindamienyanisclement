@@ -3,8 +3,8 @@ const sharp = require('sharp');
 const fs = require('fs');
 import multer from 'multer';
 import { checkFileType } from './upload';
-import { relative } from 'path';
 import { IImageCreate } from 'src/types/interfaces/image.interface';
+import logger from '../config/logger';
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -61,7 +61,7 @@ const optimizeImage = async (
         file.filename = `optimized-${denomination}-image.webp`;
         return file;
     } catch (error: any) {
-        console.error(`Optimize error: ${error.message}`);
+        logger.error(`Optimize error: ${error.message}`);
         throw new Error(error.message);
     }
 };
@@ -79,7 +79,7 @@ const getRelativePath = (absolutePath: string): string => {
 
 const formatImage = async (file: any): Promise<IImageCreate> => {
     try {
-        const filePath = file.path;
+        const filePath = getRelativePath(file.path);
         const fileName = path.basename(filePath, path.extname(filePath));
 
         const formattedImageName = `${fileName}-formatted.webp`;
@@ -149,7 +149,7 @@ const formatImage = async (file: any): Promise<IImageCreate> => {
             largeImageURL: largeImagePath,
         };
     } catch (error: any) {
-        console.error(`Change format error: ${error.message}`);
+        logger.error(`Change format error: ${error.message}`);
         throw new Error(error.message);
     }
 };
@@ -165,7 +165,7 @@ const changeImageFormat = async (file: any, format: string) => {
         file.destination,
         `format-${nameWithoutExt}.${format}`, // Utiliser le nom sans extension
     );
-    console.log('formatPath', formatPath);
+    logger.info('formatPath', formatPath);
 
     try {
         await sharp(filePath)
@@ -174,10 +174,10 @@ const changeImageFormat = async (file: any, format: string) => {
 
         file.path = formatPath;
         file.filename = `format-${nameWithoutExt}.${format}`;
-        console.log('file', file);
+        logger.info('file', file);
         return file;
     } catch (error: any) {
-        console.error(`Change format error 1 : ${error.message}`);
+        logger.error(`Change format error 1 : ${error.message}`);
         throw new Error(error.message);
     }
 };

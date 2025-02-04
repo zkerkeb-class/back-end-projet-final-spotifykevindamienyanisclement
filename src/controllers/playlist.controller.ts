@@ -5,6 +5,7 @@ import {
     IPlaylistCreate,
     IPlaylistFull,
 } from 'src/types/interfaces/playlist.interface';
+import logger from '../config/logger';
 
 const prisma = new PrismaClient();
 
@@ -79,7 +80,7 @@ export const updatePlaylist = async (req: Request, res: Response) => {
         });
         res.status(200).json(playlist);
     } catch (error) {
-        console.log('error updating playlist music', error);
+        logger.error('error updating playlist music', error);
         res.status(500).json({
             message: 'Error updating playlist music',
             error,
@@ -97,9 +98,63 @@ export const deletePlaylist = async (req: Request, res: Response) => {
         });
         res.status(204).send();
     } catch (error) {
-        console.log('error deleting playlist music', error);
+        logger.error('error deleting playlist music', error);
         res.status(500).json({
             message: 'Error deleting playlist music',
+            error,
+        });
+    }
+};
+
+export const addTrackToPlaylist = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { trackId } = req.body;
+    if (!id || !trackId)
+        res.status(400).json({
+            message: 'Playlist ID and Track ID are required',
+        });
+
+    try {
+        const playlist: any = await prisma.playlist.update({
+            where: { id: parseInt(id, 10) },
+            data: {
+                tracks: {
+                    connect: { id: parseInt(trackId, 10) },
+                },
+            },
+        });
+        res.status(200).json(playlist);
+    } catch (error) {
+        logger.error('error adding track to playlist music', error);
+        res.status(500).json({
+            message: 'Error adding track to playlist music',
+            error,
+        });
+    }
+};
+
+export const removeTrackFromPlaylist = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { trackId } = req.body;
+    if (!id || !trackId)
+        res.status(400).json({
+            message: 'Playlist ID and Track ID are required',
+        });
+
+    try {
+        const playlist: any = await prisma.playlist.update({
+            where: { id: parseInt(id, 10) },
+            data: {
+                tracks: {
+                    disconnect: { id: parseInt(trackId, 10) },
+                },
+            },
+        });
+        res.status(200).json(playlist);
+    } catch (error) {
+        logger.error('error removing track from playlist music', error);
+        res.status(500).json({
+            message: 'Error removing track from playlist music',
             error,
         });
     }

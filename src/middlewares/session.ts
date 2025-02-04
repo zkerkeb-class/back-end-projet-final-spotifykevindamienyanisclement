@@ -1,6 +1,7 @@
 import session from 'express-session';
 import connectRedis from 'connect-redis';
-import redisClient from '../conf/redisClient';
+import redisClient from '../config/redisClient';
+import logger from '../config/logger';
 
 // Créer une classe RedisStore pour stocker les sessions dans Redis
 const RedisStore = connectRedis(session);

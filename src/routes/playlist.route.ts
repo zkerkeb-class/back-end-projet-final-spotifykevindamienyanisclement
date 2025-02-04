@@ -5,12 +5,19 @@ import {
     getPlaylistById,
     updatePlaylist,
     deletePlaylist,
+    addTrackToPlaylist,
 } from '../controllers/playlist.controller';
+import { playlistSchema } from '../schemas/playlist.schema';
+import { validateRequest } from '../middlewares/validateRequest';
+import authorize from '../middlewares/authorize';
+import { Permissions } from '../config/roles';
 
 const router = express.Router();
 
 router.post(
     '/',
+    authorize([Permissions.CREATE_PLAYLIST]),
+    validateRequest(playlistSchema.create, 'body'),
     /* #swagger.tags = ['Playlist']
        #swagger.description = 'Create a new playlist music'
        #swagger.path = '/playlist'
@@ -28,17 +35,20 @@ router.post(
 
 router.get(
     '/',
+    authorize([Permissions.READ_PLAYLIST]),
+    getPlaylists,
     /* #swagger.tags = ['Playlist']
        #swagger.description = 'Get all playlist musics'
        #swagger.path = '/playlist'
        #swagger.responses[200] = { schema: { $ref: '#/definitions/playlistRequest' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
-    getPlaylists,
 );
 
 router.get(
     '/:id',
+    authorize([Permissions.READ_PLAYLIST]),
+    validateRequest(playlistSchema.idParam, 'params'),
     /* #swagger.tags = ['Playlist']
        #swagger.description = 'Get a playlist music by ID'
        #swagger.path = '/playlist/{id}'
@@ -52,6 +62,9 @@ router.get(
 
 router.put(
     '/:id',
+    authorize([Permissions.UPDATE_PLAYLIST]),
+    validateRequest(playlistSchema.idParam, 'params'),
+    validateRequest(playlistSchema.update, 'body'),
     /* #swagger.tags = ['Playlist']
        #swagger.description = 'Update a playlist music by ID'
        #swagger.path = '/playlist/{id}'
@@ -70,6 +83,8 @@ router.put(
 
 router.delete(
     '/:id',
+    authorize([Permissions.DELETE_PLAYLIST]),
+    validateRequest(playlistSchema.idParam, 'params'),
     /* #swagger.tags = ['Playlist']
        #swagger.description = 'Delete a playlist music by ID'
        #swagger.path = '/playlist/{id}'
@@ -77,6 +92,21 @@ router.delete(
        #swagger.responses[204] = { schema: { $ref: '#/definitions/successResponse.204' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */
+    deletePlaylist,
+);
+
+router.post(
+    '/:id/tracks',
+    authorize([Permissions.UPDATE_PLAYLIST]),
+    validateRequest(playlistSchema.idParam, 'params'),
+    validateRequest(playlistSchema.addTrack, 'body'),
+    addTrackToPlaylist,
+);
+
+router.delete(
+    '/:id/tracks/:trackId',
+    authorize([Permissions.UPDATE_PLAYLIST]),
+    validateRequest(playlistSchema.trackIdParam, 'params'),
     deletePlaylist,
 );
 

@@ -2,6 +2,7 @@ import { IArtist } from './artist.interface';
 import { IAlbum } from './album.interface';
 import { ISound } from './sound.interface';
 import { IPlaylist } from './playlist.interface';
+import { IGroup } from './group.interface';
 
 export interface ITrackFull {
     id: number;
@@ -19,6 +20,9 @@ export interface ITrackFull {
     artist: IArtist;
     artistId: number;
 
+    groupId: number;
+    group: IGroup;
+
     createdAt: Date;
     updatedAt: Date;
 }
@@ -32,6 +36,7 @@ export interface ITrack {
     albumId: number;
     playlistId: number | null;
     artistId: number | null;
+    groupId: number | null;
 
     createdAt: Date;
     updatedAt: Date;

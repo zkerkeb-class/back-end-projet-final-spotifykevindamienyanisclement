@@ -50,16 +50,23 @@ model Sound {
   updatedAt DateTime @updatedAt
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id       Int     @id @default(autoincrement())
   email    String  @unique
   name     String?
   password String
+  role     Role    @default(USER) // USER | ADMIN
 
   playlists Playlist[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  AuditLog  AuditLog[]
 }
 
 model artist {
@@ -102,14 +109,19 @@ model Track {
   id    Int    @id @default(autoincrement())
   title String
 
-  soundId    Int?
-  sound      Sound?    @relation(fields: [soundId], references: [id])
-  albumId    Int
-  album      Album     @relation(fields: [albumId], references: [id])
+  soundId Int?
+  sound   Sound? @relation(fields: [soundId], references: [id])
+
+  albumId Int
+  album   Album @relation(fields: [albumId], references: [id])
+
   playlist   Playlist? @relation(fields: [playlistId], references: [id])
   playlistId Int?
-  artist     artist?   @relation(fields: [artistId], references: [id])
-  artistId   Int?
+
+  artist   artist? @relation(fields: [artistId], references: [id])
+  artistId Int?
+  groupId  Int?
+  group    Group?  @relation(fields: [groupId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -138,7 +150,26 @@ model Group {
 
   artists artist[]
   albums  Album[]
+  Track   Track[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  action     String
+  resource   String
+  resourceId Int?
+  details    String   @db.Text
+  ipAddress  String
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
 }

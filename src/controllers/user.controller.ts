@@ -6,6 +6,7 @@ import {
     IUserFull,
     IUserUpdate,
 } from 'src/types/interfaces/user.interface';
+import logger from '../config/logger';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ export const createUser = async (req: Request, res: Response) => {
         });
         res.status(201).json(user);
     } catch (error) {
-        console.log('error creating user', error);
+        logger.error('error creating user', error);
         res.status(500).json({ message: 'Error creating user', error });
     }
 };
@@ -28,7 +29,7 @@ export const getUsers = async (req: Request, res: Response) => {
         const users: IUser[] = await prisma.user.findMany();
         res.status(200).json(users);
     } catch (error) {
-        console.log('error fetching users', error);
+        logger.error('error fetching users', error);
         res.status(500).json({ message: 'Error fetching users', error });
     }
 };
@@ -53,7 +54,7 @@ export const getUserById = async (req: Request, res: Response) => {
             res.status(404).json({ message: 'User not found' });
         }
     } catch (error) {
-        console.log('error fetching user', error);
+        logger.error('error fetching user', error);
         res.status(500).json({ message: 'Error fetching user', error });
     }
 };
@@ -71,7 +72,7 @@ export const updateUser = async (req: Request, res: Response) => {
         });
         res.status(200).json(user);
     } catch (error) {
-        console.log('error updating user', error);
+        logger.error('error updating user', error);
         res.status(500).json({ message: 'Error updating user', error });
     }
 };
@@ -87,7 +88,7 @@ export const deleteUser = async (req: Request, res: Response) => {
         });
         res.status(204).send();
     } catch (error) {
-        console.log('error deleting user', error);
+        logger.error('error deleting user', error);
         res.status(500).json({ message: 'Error deleting user', error });
     }
 };

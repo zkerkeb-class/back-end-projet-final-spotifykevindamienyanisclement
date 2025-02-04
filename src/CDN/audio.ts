@@ -3,7 +3,8 @@ const fs = require('fs');
 import multer from 'multer';
 import { checkFileType } from './upload';
 import ffmpeg from 'fluent-ffmpeg';
-import { ISound, ISoundCreate } from '../types/interfaces/sound.interface';
+import { ISoundCreate } from '../types/interfaces/sound.interface';
+import logger from '../config/logger';
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -32,7 +33,7 @@ const storage = multer.diskStorage({
 // Initialize upload
 const uploadAudio = multer({
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
     fileFilter: (req: any, file: any, cb: any) => {
         const filetypes = /mp3|wav|flac|ogg|webm|aac|alac|aiff|dsd|mpeg/;
         checkFileType(file, cb, filetypes);
@@ -44,18 +45,13 @@ const getRelativePath = (absolutePath: string): string => {
         // Obtenir le chemin de la racine du projet
         const projectRoot = path.resolve(__dirname, '../../');
 
-        console.log('projectRoot', projectRoot);
-        console.log('absolutePath', absolutePath);
-
         // Obtenir le chemin relatif
         const relativePath = path.relative(projectRoot, absolutePath);
-
-        console.log('relativePath', relativePath);
 
         // Normaliser les séparateurs de chemin (utiliser des forward slashes)
         return relativePath.split(path.sep).join('/');
     } catch (error: any) {
-        console.error(`getRelativePath error 1: ${error.message}`);
+        logger.error(`getRelativePath error 1: ${error.message}`);
         throw new Error(error.message);
     }
 };
@@ -97,10 +93,10 @@ const formatAudio = async (file: any): Promise<ISoundCreate> => {
         //     filename: m4aAudio.filename,
         //     relativePath: getRelativePath(m4aAudio.path),
         // };
-        // console.log('formattedaudio', m4aAudio);
+        // logger.info('formattedaudio', m4aAudio);
 
         const wavAudio: any = await changeAudioFormat(file, 'wav');
-        console.log('wav Audio', wavAudio);
+        logger.info('wav Audio', wavAudio);
         metadatas.wavAudio = {
             filename: wavAudio.filename,
             relativePath: getRelativePath(wavAudio.path),
@@ -118,7 +114,7 @@ const formatAudio = async (file: any): Promise<ISoundCreate> => {
             duration, // Ajouter la durée ici
         };
     } catch (error: any) {
-        console.error(`format audio error 2 : ${error.message}`);
+        logger.error(`format audio error 2 : ${error.message}`);
         throw new Error(error.message);
     }
 };
@@ -131,7 +127,7 @@ const changeAudioFormat = async (file: any, format: string) => {
         `converted-${parsedFile.name}.${format}`,
     );
 
-    console.log('format', format);
+    logger.info('format', format);
     return new Promise((resolve, reject) => {
         ffmpeg()
             .input(inputPath)

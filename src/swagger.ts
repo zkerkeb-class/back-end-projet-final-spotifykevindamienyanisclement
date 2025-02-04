@@ -39,7 +39,15 @@ const doc = {
             description: 'Groups related apis',
         },
     ],
-    securityDefinitions: {},
+    securityDefinitions: {
+        bearerAuth: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header',
+            description:
+                'Entrez votre token JWT avec le préfixe Bearer. Exemple: Bearer <token>',
+        },
+    },
     definitions: {
         'successResponse.200': {
             code: 200,
@@ -263,7 +271,40 @@ const doc = {
             createdAt: '2021-09-01T00:00:00.000Z',
             updatedAt: '2021-09-01T00:00:00.000Z',
         },
+
+        loginRequest: {
+            type: 'object',
+            properties: {
+                email: {
+                    type: 'string',
+                    example: 'user@example.com',
+                },
+                password: {
+                    type: 'string',
+                    example: 'password123',
+                },
+            },
+            required: ['email', 'password'],
+        },
+
+        loginResponse: {
+            type: 'object',
+            properties: {
+                token: {
+                    type: 'string',
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                },
+                user: {
+                    $ref: '#/definitions/userResponse',
+                },
+            },
+        },
     },
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
 };
 
 const outputFile = './docs/swagger.json';

@@ -7,6 +7,7 @@ import {
     IAlbumUpdate,
 } from 'src/types/interfaces/album.interface';
 import { ITrackCreate } from 'src/types/interfaces/track.interface';
+import logger from '../config/logger';
 
 const prisma = new PrismaClient();
 
@@ -24,6 +25,8 @@ export const createAlbum = async (req: Request, res: Response) => {
                 data: tracks.map((track: ITrackCreate) => ({
                     ...track,
                     albumId: album.id,
+                    artistId: artistId,
+                    groupId: groupId,
                 })),
             });
             res.status(201).json({ ...album, tracks: createdTracks });
@@ -31,7 +34,7 @@ export const createAlbum = async (req: Request, res: Response) => {
 
         res.status(201).json(album);
     } catch (error) {
-        console.log('error creating music album', error);
+        logger.error('error creating music album', error);
         res.status(500).json({ message: 'Error creating music album', error });
     }
 };
@@ -43,7 +46,7 @@ export const getAlbums = async (req: Request, res: Response) => {
         });
         res.status(200).json(albums);
     } catch (error) {
-        console.log('error fetching music albums', error);
+        logger.error('error fetching music albums', error);
         res.status(500).json({ message: 'Error fetching music albums', error });
     }
 };
@@ -76,7 +79,7 @@ export const getAlbumById = async (req: Request, res: Response) => {
             res.status(404).json({ message: 'Music album not found' });
         }
     } catch (error) {
-        console.log('error fetching music album', error);
+        logger.error('error fetching music album', error);
         res.status(500).json({ message: 'Error fetching music album', error });
     }
 };
@@ -94,7 +97,7 @@ export const updateAlbum = async (req: Request, res: Response) => {
         });
         res.status(200).json(album);
     } catch (error) {
-        console.log('error updating music album', error);
+        logger.error('error updating music album', error);
         res.status(500).json({ message: 'Error updating music album', error });
     }
 };
@@ -111,7 +114,7 @@ export const deleteAlbum = async (req: Request, res: Response) => {
         });
         res.status(204).send();
     } catch (error) {
-        console.log('error deleting music album', error);
+        logger.error('error deleting music album', error);
         res.status(500).json({ message: 'Error deleting music album', error });
     }
 };

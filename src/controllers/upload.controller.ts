@@ -3,13 +3,14 @@ import { formatAudio } from '../CDN/audio';
 import { ISound, ISoundCreate } from '../types/interfaces/sound.interface';
 import { IImage, IImageCreate } from '../types/interfaces/image.interface';
 import { PrismaClient } from '@prisma/client';
+import logger from '../config/logger';
 
 const prisma = new PrismaClient();
 
 const uploadController = {
     uploadAudio: async (req: any, res: any) => {
         const audioUpload = req.file;
-        console.log(audioUpload);
+        logger.info(audioUpload);
 
         if (!audioUpload) {
             res.status(400).json({
@@ -30,7 +31,7 @@ const uploadController = {
                 audio,
             });
         } catch (error: any) {
-            console.error(`Change format error: ${error.message}`);
+            logger.error(`Change format error: ${error.message}`);
             res.status(400).json({
                 success: false,
                 message: "Erreur lors du changement de format de l'audio",
@@ -40,7 +41,7 @@ const uploadController = {
     uploadImage: async (req: any, res: any) => {
         // Accéder au fichier uploadé
         const file = req.file;
-        console.log(file);
+        logger.info(file);
 
         // Vérifier si un fichier a été uploadé
         if (!file) {
@@ -63,7 +64,7 @@ const uploadController = {
                 image,
             });
         } catch (error: any) {
-            console.error(`Change format error: ${error.message}`);
+            logger.error(`Change format error: ${error.message}`);
             res.status(400).json({
                 success: false,
                 message: "Erreur lors du changement de format de l'image",

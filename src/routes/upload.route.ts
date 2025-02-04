@@ -3,10 +3,15 @@ const router = express.Router();
 import uploadController from '../controllers/upload.controller';
 import { uploadImage } from '../CDN/image';
 import { uploadAudio } from '../CDN/audio';
+import { validateRequest } from '../middlewares/validateRequest';
+import authorize from '../middlewares/authorize';
+import { Permissions } from '../config/roles';
+import { uploadSchema } from '../schemas/upload.schema';
+import { auditLog } from '../middlewares/auditLog';
 
 router.post(
     '/audio',
-    // uploadImage,
+    authorize([Permissions.UPLOAD_FILE]),
     uploadAudio,
     /*
         #swagger.tags = ['Upload']
@@ -29,11 +34,13 @@ router.post(
           schema: { $ref: "#/definitions/errorResponse.401" }
         }
 	*/
+    auditLog('UPLOAD_AUDIO'),
     uploadController.uploadAudio,
 );
 
 router.post(
     '/image',
+    authorize([Permissions.UPLOAD_FILE]),
     uploadImage,
     /*
         #swagger.tags = ['Upload']
@@ -56,6 +63,7 @@ router.post(
           schema: { $ref: "#/definitions/errorResponse.401" }
         }
   */
+    auditLog('UPLOAD_IMAGE'),
     uploadController.uploadImage,
 );
 
