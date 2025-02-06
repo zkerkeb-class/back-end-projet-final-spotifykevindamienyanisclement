@@ -37,7 +37,10 @@
     "prepare": "husky",
     "build": "npm run build:swagger && npx tsc",
     "build:swagger": "node ./src/swagger.ts",
-    "test": "jest"
+    "test": "jest",
+    "db:seed": "node scripts/seed.js",
+    "db:update-sounds": "node scripts/update-sounds.js",
+    "db:clean": "node scripts/clean-db.js"
   },
   "lint-staged": {
     "*.{js,ts}": [

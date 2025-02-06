@@ -12,9 +12,9 @@ export const validateRequest = (
         next: NextFunction,
     ): Promise<void> => {
         try {
-            const { error } = schema.validate(req[property], {
+            const { error, value } = schema.validate(req[property], {
                 abortEarly: false,
-                stripUnknown: true,
+                stripUnknown: true, // Cette option supprime les champs non définis dans le schéma
             });
 
             if (error) {
@@ -44,6 +44,9 @@ export const validateRequest = (
                 });
                 return;
             }
+
+            // Replace the request property with the validated and stripped value
+            req[property] = value;
 
             next();
         } catch (err) {

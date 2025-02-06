@@ -70,6 +70,20 @@ getAllTracksRouter.get(
     /* #swagger.tags = ['Track']
        #swagger.description = 'Get all tracks'
        #swagger.path = '/track'
+       #swagger.parameters['limit'] = {
+           in: 'query',
+           required: false,
+           type: 'integer',
+           description: 'Number of albums to return',
+           example: 10
+       }
+       #swagger.parameters['offset'] = {
+           in: 'query',
+           required: false,
+           type: 'integer',
+           description: 'Number of albums to skip',
+           example: 0
+       }
        #swagger.responses[200] = { schema: { $ref: '#/definitions/trackRequest' } }
        #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
     */

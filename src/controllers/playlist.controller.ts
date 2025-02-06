@@ -26,9 +26,13 @@ export const createPlaylist = async (req: Request, res: Response) => {
 };
 
 export const getPlaylists = async (req: Request, res: Response) => {
+    const { limit = 10, offset = 0 } = req.query;
+
     try {
         const playlists: IPlaylist[] = await prisma.playlist.findMany({
             include: { image: true },
+            take: Number(limit),
+            skip: Number(offset),
         });
         res.status(200).json(playlists);
     } catch (error) {

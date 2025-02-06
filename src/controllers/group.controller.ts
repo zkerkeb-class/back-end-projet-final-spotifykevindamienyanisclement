@@ -26,9 +26,13 @@ export const createGroup = async (req: Request, res: Response) => {
 };
 
 export const getGroups = async (req: Request, res: Response) => {
+    const { limit = 10, offset = 0 } = req.query;
+
     try {
         const groups: IGroup[] = await prisma.group.findMany({
             include: { image: true },
+            take: Number(limit),
+            skip: Number(offset),
         });
         res.status(200).json(groups);
     } catch (error) {

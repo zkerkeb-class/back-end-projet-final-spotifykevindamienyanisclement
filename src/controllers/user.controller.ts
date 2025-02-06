@@ -25,8 +25,13 @@ export const createUser = async (req: Request, res: Response) => {
 };
 
 export const getUsers = async (req: Request, res: Response) => {
+    const { limit = 10, offset = 0 } = req.query;
+
     try {
-        const users: IUser[] = await prisma.user.findMany();
+        const users: IUser[] = await prisma.user.findMany({
+            take: Number(limit),
+            skip: Number(offset),
+        });
         res.status(200).json(users);
     } catch (error) {
         logger.error('error fetching users' + error);
