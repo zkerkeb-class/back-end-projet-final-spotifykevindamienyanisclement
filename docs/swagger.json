@@ -34,6 +34,14 @@
     {
       "name": "User",
       "description": "User related apis"
+    },
+    {
+      "name": "Metrics",
+      "description": "Metrics related apis"
+    },
+    {
+      "name": "JamSession",
+      "description": "JamSession related apis"
     }
   ],
   "schemes": [
@@ -601,6 +609,24 @@
           "Playlist"
         ],
         "description": "Get all playlist musics",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to return",
+            "example": 10
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to skip",
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -906,6 +932,24 @@
           "Group"
         ],
         "description": "Get all artist groups",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to return",
+            "example": 10
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to skip",
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1217,45 +1261,6 @@
       }
     },
     "/album/{albumId}/track": {
-      "post": {
-        "tags": [
-          "Track"
-        ],
-        "description": "Create a new track in album",
-        "parameters": [
-          {
-            "name": "albumId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/trackCreate"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/successResponse.201"
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "schema": {
-              "$ref": "#/definitions/errorResponse.500"
-            }
-          }
-        }
-      },
       "get": {
         "tags": [
           "Track"
@@ -1305,6 +1310,42 @@
       }
     },
     "/track": {
+      "post": {
+        "tags": [
+          "Track"
+        ],
+        "description": "Create a new track in album",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/trackCreate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/successResponse.201"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      },
       "get": {
         "tags": [
           "Track"
@@ -1314,12 +1355,18 @@
           {
             "name": "limit",
             "in": "query",
-            "type": "string"
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to return",
+            "example": 10
           },
           {
             "name": "offset",
             "in": "query",
-            "type": "string"
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to skip",
+            "example": 0
           }
         ],
         "responses": {
@@ -1460,6 +1507,92 @@
         }
       }
     },
+    "/metrics/business-data": {
+      "get": {
+        "tags": [
+          "Metrics"
+        ],
+        "description": "Obtenir les données métier",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Nombre de jours à retourner",
+            "example": 30
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/getBuisnessData"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/metrics/system-performance": {
+      "get": {
+        "tags": [
+          "Metrics"
+        ],
+        "description": "Obtenir les données de performance du système",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Nombre de jours à retourner",
+            "example": 30
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/getSystemPerformance"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
+    "/metrics/endpoint-performance": {
+      "get": {
+        "tags": [
+          "Metrics"
+        ],
+        "description": "Obtenir les données de performance du système",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/getSystemPerformance"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/errorResponse.500"
+            }
+          }
+        }
+      }
+    },
     "/track/{{where{id}": {
       "delete": {
         "description": "",
@@ -1499,6 +1632,24 @@
           "User"
         ],
         "description": "Get all user",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to return",
+            "example": 10
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of albums to skip",
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1713,6 +1864,356 @@
     "/user/{{where{id:parseInt(id}": {
       "delete": {
         "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/jam-session/": {
+      "post": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Create a new jam session",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Get all active jam sessions",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/jam-session/{id}": {
+      "delete": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Delete a jam session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Get a specific jam session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/jam-session/{id}/join": {
+      "post": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Join a jam session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/jam-session/{id}/leave": {
+      "delete": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Leave a jam session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/jam-session/{id}/track": {
+      "put": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Update current track in session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "trackId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/jam-session/{id}/position": {
+      "put": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Update track position in a jam session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "position": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "number"
+                    },
+                    "example": {
+                      "type": "number",
+                      "example": 120.5
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/jam-session/{id}/playstate": {
+      "put": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Update track play state in a jam session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "isPlaying": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "boolean"
+                    },
+                    "example": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/jam-session/{{where{id:parseInt(id)}}": {
+      "delete": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/jam-session/{{where{userId_sessionId:{userId}": {
+      "delete": {
+        "tags": [
+          "JamSession"
+        ],
+        "description": "Create a new jam session",
+        "parameters": [
+          {
+            "name": null,
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "default": {
             "description": ""
@@ -2127,6 +2628,15 @@
         "image": {
           "$ref": "#/definitions/imageResponse"
         },
+        "groupIds": {
+          "type": "array",
+          "example": [
+            1
+          ],
+          "items": {
+            "type": "number"
+          }
+        },
         "createdAt": {
           "type": "string",
           "example": "2021-09-01T00:00:00.000Z"
@@ -2140,6 +2650,7 @@
         "id",
         "name",
         "image",
+        "groupIds",
         "createdAt",
         "updatedAt"
       ]
@@ -2164,6 +2675,21 @@
             "$ref": "#/definitions/albumResponse"
           }
         },
+        "groupIds": {
+          "type": "array",
+          "example": [
+            1
+          ],
+          "items": {
+            "type": "number"
+          }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/groupResponse"
+          }
+        },
         "createdAt": {
           "type": "string",
           "example": "2021-09-01T00:00:00.000Z"
@@ -2178,6 +2704,8 @@
         "name",
         "image",
         "albums",
+        "groupIds",
+        "groups",
         "createdAt",
         "updatedAt"
       ]
@@ -2529,6 +3057,498 @@
               "$ref": "#/definitions/userResponse"
             }
           }
+        }
+      }
+    },
+    "getBuisnessData": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "example": "object"
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "Streams": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "array"
+                },
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "string"
+                            }
+                          }
+                        },
+                        "count": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "ActiveUsers": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "array"
+                },
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "string"
+                            }
+                          }
+                        },
+                        "count": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getAveragePerformanceByEndpoint": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "example": "array"
+        },
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "example": "object"
+            },
+            "properties": {
+              "type": "object",
+              "properties": {
+                "endpoint": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                },
+                "_avg": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "duration": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        },
+                        "responseTime": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        },
+                        "heapUsed": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        },
+                        "heapTotal": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        },
+                        "rss": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        },
+                        "cpu": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        },
+                        "bandwidth": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "_count": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "endpoint": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getSystemPerformance": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "example": "array"
+        },
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "example": "array"
+            },
+            "properties": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "method": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "url": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "endpoint": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "duration": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "responseTime": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "statusCodeDistribution": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "heapUsed": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "heapTotal": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "rss": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "cpu": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "bandwidth": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        }
+                      }
+                    },
+                    "createdAt": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "updatedAt": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "jamSessionCreate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Session Name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "jamSessionResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Session Name"
+        },
+        "hostId": {
+          "type": "number",
+          "example": 1
+        },
+        "currentTrackId": {
+          "type": "number",
+          "example": 1
+        },
+        "host": {
+          "$ref": "#/definitions/userResponse"
+        },
+        "currentTrack": {
+          "$ref": "#/definitions/trackRequest"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "number",
+                "example": 1
+              },
+              "sessionId": {
+                "type": "number",
+                "example": 1
+              },
+              "user": {
+                "$ref": "#/definitions/userResponse"
+              }
+            }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-09-01T00:00:00.000Z"
+        }
+      }
+    },
+    "jamSessionUpdate": {
+      "type": "object",
+      "properties": {
+        "trackId": {
+          "type": "number",
+          "example": 1
+        }
+      },
+      "required": [
+        "trackId"
+      ]
+    },
+    "jamSessionParticipant": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "number",
+          "example": 1
+        },
+        "sessionId": {
+          "type": "number",
+          "example": 1
+        },
+        "user": {
+          "$ref": "#/definitions/userResponse"
+        },
+        "session": {
+          "$ref": "#/definitions/jamSessionResponse"
         }
       }
     }

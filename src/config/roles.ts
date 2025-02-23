@@ -41,6 +41,13 @@ export const Permissions = {
     UPLOAD_FILE: 'upload_file',
 
     READ_SOUND: 'read_sound',
+
+    CREATE_JAM_SESSION: 'create:jam_session',
+    DELETE_JAM_SESSION: 'delete:jam_session',
+    JOIN_JAM_SESSION: 'join:jam_session',
+    LEAVE_JAM_SESSION: 'leave:jam_session',
+    READ_JAM_SESSION: 'read:jam_session',
+    UPDATE_JAM_SESSION: 'update:jam_session',
 };
 
 export const RolePermissions = {
@@ -71,6 +78,13 @@ export const RolePermissions = {
         Permissions.DELETE_TRACK,
 
         Permissions.UPLOAD_FILE,
+
+        Permissions.READ_JAM_SESSION,
+        Permissions.CREATE_JAM_SESSION,
+        Permissions.DELETE_JAM_SESSION,
+        Permissions.JOIN_JAM_SESSION,
+        Permissions.LEAVE_JAM_SESSION,
+        Permissions.UPDATE_JAM_SESSION,
     ],
     [Roles.ANONYMOUS]: [
         Permissions.READ_USER,
@@ -107,5 +121,9 @@ export const RolePermissions = {
         Permissions.UPDATE_PLAYLIST,
         Permissions.DELETE_PLAYLIST,
         Permissions.READ_CURRENT_USER,
+        Permissions.CREATE_JAM_SESSION,
+        Permissions.DELETE_JAM_SESSION,
+        Permissions.JOIN_JAM_SESSION,
+        Permissions.LEAVE_JAM_SESSION,
     ],
 };

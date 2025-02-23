@@ -9,12 +9,11 @@ datasource db {
 }
 
 model Image {
-  id Int @id @default(autoincrement())
-
-  originalImageName  String
-  originalImageURL   String
+  id                 Int        @id @default(autoincrement())
   formattedImageName String
   formattedImageURL  String
+  originalImageName  String
+  originalImageURL   String
   avifImageName      String
   avifImageURL       String
   smallImageName     String
@@ -23,150 +22,127 @@ model Image {
   mediumImageURL     String
   largeImageName     String
   largeImageURL      String
-
-  artists   artist[]
-  albums    Album[]
-  groups    Group[]
-  playlists Playlist[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  albums             Album[]
+  groups             Group[]
+  playlists          Playlist[]
+  artists            artist[]
 }
 
 model Sound {
-  id       Int @id @default(autoincrement())
-  duration Int
-
+  id                Int      @id @default(autoincrement())
+  duration          Int
   originalSoundName String
   originalSoundURL  String
   wavSoundName      String
   wavSoundURL       String
   m4aSoundName      String
   m4aSoundURL       String
-
-  tracks Track[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum Role {
-  USER
-  ADMIN
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tracks            Track[]
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String
-  role     Role    @default(USER) // USER | ADMIN
-
-  playlists Playlist[]
-  AuditLog  AuditLog[]
-  TrackRead TrackRead[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                Int              @id @default(autoincrement())
+  email             String           @unique
+  name              String?
+  password          String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  role              Role             @default(USER)
+  AuditLog          AuditLog[]
+  playlists         Playlist[]
+  TrackRead         TrackRead[]
+  hostedSessions    JamSession[]     @relation("HostedSessions")
+  jamParticipations JamParticipant[]
 }
 
 model TrackRead {
-  id      Int @id @default(autoincrement())
-  userId  Int
-  trackId Int
-
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
-
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  trackId   Int
   createdAt DateTime @default(now())
+  track     Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model artist {
-  id   Int    @id @default(autoincrement())
-  name String
-
-  image   Image? @relation(fields: [imageId], references: [id], onDelete: Cascade)
-  imageId Int?
-
-  groupId Int?
-  group   Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-  albums Album[]
-  tracks Track[]
-
+  id        Int      @id @default(autoincrement())
+  name      String
+  imageId   Int?
+  groupId   Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  genre     String   @default("")
+  albums    Album[]
+  tracks    Track[]
+  group     Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  image     Image?   @relation(fields: [imageId], references: [id], onDelete: Cascade)
 }
 
 model Album {
-  id    Int    @id @default(autoincrement())
-  title String
-
-  image   Image? @relation(fields: [imageId], references: [id], onDelete: Cascade)
-  imageId Int?
-
-  artistId Int?
-  artist   artist? @relation(fields: [artistId], references: [id], onDelete: Cascade)
-
-  groupId Int?
-  group   Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-  tracks Track[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  title       String
+  imageId     Int?
+  groupId     Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  artistId    Int?
+  genre       String   @default("")
+  releaseYear Int      @default(0)
+  artist      artist?  @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  group       Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  image       Image?   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  tracks      Track[]
 }
 
 model Track {
-  id    Int    @id @default(autoincrement())
-  title String
-
-  soundId Int?
-  sound   Sound? @relation(fields: [soundId], references: [id], onDelete: Cascade)
-
-  albumId Int
-  album   Album @relation(fields: [albumId], references: [id], onDelete: Cascade)
-
-  playlist   Playlist? @relation(fields: [playlistId], references: [id], onDelete: Cascade)
-  playlistId Int?
-
-  artist   artist? @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  artistId Int?
-  groupId  Int?
-  group    Group?  @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  TrackRead TrackRead[]
+  id          Int          @id @default(autoincrement())
+  title       String
+  albumId     Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  playlistId  Int?
+  soundId     Int?
+  artistId    Int?
+  groupId     Int?
+  duration    Int          @default(0)
+  genre       String       @default("")
+  popularity  Int          @default(0)
+  releaseYear Int          @default(0)
+  album       Album        @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  artist      artist?      @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  group       Group?       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  playlist    Playlist?    @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  sound       Sound?       @relation(fields: [soundId], references: [id], onDelete: Cascade)
+  TrackRead   TrackRead[]
+  jamSessions JamSession[] @relation("CurrentTrack")
 }
 
 model Playlist {
-  id    Int    @id @default(autoincrement())
-  title String
-
-  imageId Int?
-  image   Image?  @relation(fields: [imageId], references: [id], onDelete: Cascade)
-  userId  Int
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tracks  Track[]
-
+  id        Int      @id @default(autoincrement())
+  title     String
+  imageId   Int?
+  userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  image     Image?   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tracks    Track[]
 }
 
 model Group {
-  id   Int    @id @default(autoincrement())
-  name String
-
-  imageId Int?
-  image   Image? @relation(fields: [imageId], references: [id], onDelete: Cascade)
-
-  artists artist[]
-  albums  Album[]
-  Track   Track[]
-
+  id        Int      @id @default(autoincrement())
+  name      String
+  imageId   Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  albums    Album[]
+  image     Image?   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  Track     Track[]
+  artists   artist[]
 }
 
 model AuditLog {
@@ -175,14 +151,63 @@ model AuditLog {
   action     String
   resource   String
   resourceId Int?
-  details    String   @db.Text
+  details    String
   ipAddress  String
   createdAt  DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([action])
   @@index([resource])
   @@index([createdAt])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model PerformanceMetric {
+  id                     Int      @id @default(autoincrement())
+  method                 String
+  url                    String
+  endpoint               String
+  status                 Int
+  duration               Float
+  responseTime           Float
+  statusCodeDistribution Json
+  heapUsed               Float
+  heapTotal              Float
+  rss                    Float
+  cpu                    Float?
+  bandwidth              Float?
+  createdAt              DateTime @default(now())
+}
+
+model JamSession {
+  id             Int      @id @default(autoincrement())
+  name           String
+  hostId         Int
+  currentTrackId Int?
+  isActive       Boolean  @default(true)
+  position       Float    @default(0)
+  isPlaying      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  host         User             @relation("HostedSessions", fields: [hostId], references: [id])
+  currentTrack Track?           @relation("CurrentTrack", fields: [currentTrackId], references: [id])
+  participants JamParticipant[]
+}
+
+model JamParticipant {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  sessionId Int
+  joinedAt  DateTime @default(now())
+
+  user    User       @relation(fields: [userId], references: [id])
+  session JamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sessionId])
 }

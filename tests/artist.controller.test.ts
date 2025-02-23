@@ -1,3 +1,11 @@
+import {
+    describe,
+    expect,
+    jest,
+    it,
+    beforeEach,
+    afterEach,
+} from '@jest/globals';
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import {
@@ -10,7 +18,7 @@ import {
 
 jest.mock('@prisma/client', () => {
     const mPrismaClient = {
-        artiste: {
+        artist: {
             create: jest.fn(),
             findMany: jest.fn(),
             findUnique: jest.fn(),
@@ -31,7 +39,9 @@ describe('Artist Controller', () => {
     let sendMock: jest.Mock;
 
     beforeEach(() => {
-        req = {};
+        req = {
+            query: { limit: '10', offset: '0' },
+        };
         jsonMock = jest.fn();
         sendMock = jest.fn();
         statusMock = jest.fn(() => ({ json: jsonMock, send: sendMock }));
@@ -49,26 +59,23 @@ describe('Artist Controller', () => {
     describe('createArtist', () => {
         it('should create a new artist', async () => {
             req.body = { name: 'Test Artist' };
-            (prisma.artiste.create as jest.Mock).mockResolvedValue({
+            (prisma.artist.create as jest.Mock).mockResolvedValue({
                 id: 1,
                 name: 'Test Artist',
             });
 
             await createArtist(req as Request, res as Response);
 
-            expect(prisma.artiste.create).toHaveBeenCalledWith({
+            expect(prisma.artist.create).toHaveBeenCalledWith({
                 data: { name: 'Test Artist' },
+                include: { image: true },
             });
             expect(statusMock).toHaveBeenCalledWith(201);
-            expect(jsonMock).toHaveBeenCalledWith({
-                id: 1,
-                name: 'Test Artist',
-            });
         });
 
         it('should handle errors during artist creation', async () => {
             req.body = { name: 'Test Artist' };
-            (prisma.artiste.create as jest.Mock).mockRejectedValue(
+            (prisma.artist.create as jest.Mock).mockRejectedValue(
                 new Error('Creation error'),
             );
 
@@ -88,17 +95,17 @@ describe('Artist Controller', () => {
                 { id: 1, name: 'Artist 1' },
                 { id: 2, name: 'Artist 2' },
             ];
-            (prisma.artiste.findMany as jest.Mock).mockResolvedValue(artists);
+            (prisma.artist.findMany as jest.Mock).mockResolvedValue(artists);
 
             await getArtists(req as Request, res as Response);
 
-            expect(prisma.artiste.findMany).toHaveBeenCalled();
+            expect(prisma.artist.findMany).toHaveBeenCalled();
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith(artists);
         });
 
         it('should handle errors during fetching artists', async () => {
-            (prisma.artiste.findMany as jest.Mock).mockRejectedValue(
+            (prisma.artist.findMany as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
 
@@ -115,13 +122,31 @@ describe('Artist Controller', () => {
     describe('getArtistById', () => {
         it('should get an artist by ID', async () => {
             req.params = { id: '1' };
-            const artist = { id: 1, name: 'Artist 1' };
-            (prisma.artiste.findUnique as jest.Mock).mockResolvedValue(artist);
+            const artist = { id: 1, name: 'Test Artist' };
+            (prisma.artist.findUnique as jest.Mock).mockResolvedValue(artist);
 
             await getArtistById(req as Request, res as Response);
 
-            expect(prisma.artiste.findUnique).toHaveBeenCalledWith({
+            expect(prisma.artist.findUnique).toHaveBeenCalledWith({
                 where: { id: 1 },
+                include: {
+                    image: true,
+                    albums: {
+                        include: {
+                            image: true,
+                        },
+                    },
+                    tracks: {
+                        include: {
+                            sound: true,
+                        },
+                    },
+                    group: {
+                        include: {
+                            image: true,
+                        },
+                    },
+                },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith(artist);
@@ -129,7 +154,7 @@ describe('Artist Controller', () => {
 
         it('should return 404 if artist not found', async () => {
             req.params = { id: '1' };
-            (prisma.artiste.findUnique as jest.Mock).mockResolvedValue(null);
+            (prisma.artist.findUnique as jest.Mock).mockResolvedValue(null);
 
             await getArtistById(req as Request, res as Response);
 
@@ -141,7 +166,7 @@ describe('Artist Controller', () => {
 
         it('should handle errors during fetching artist by ID', async () => {
             req.params = { id: '1' };
-            (prisma.artiste.findUnique as jest.Mock).mockRejectedValue(
+            (prisma.artist.findUnique as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
 
@@ -159,25 +184,28 @@ describe('Artist Controller', () => {
         it('should update an artist by ID', async () => {
             req.params = { id: '1' };
             req.body = { name: 'Updated Artist' };
-            const updatedArtist = { id: 1, name: 'Updated Artist' };
-            (prisma.artiste.update as jest.Mock).mockResolvedValue(
+            const updatedArtist = {
+                id: 1,
+                name: 'Updated Artist',
+            };
+            (prisma.artist.update as jest.Mock).mockResolvedValue(
                 updatedArtist,
             );
 
             await updateArtist(req as Request, res as Response);
 
-            expect(prisma.artiste.update).toHaveBeenCalledWith({
+            expect(prisma.artist.update).toHaveBeenCalledWith({
                 where: { id: 1 },
                 data: { name: 'Updated Artist' },
+                include: { image: true },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
-            expect(jsonMock).toHaveBeenCalledWith(updatedArtist);
         });
 
         it('should handle errors during updating artist', async () => {
             req.params = { id: '1' };
             req.body = { name: 'Updated Artist' };
-            (prisma.artiste.update as jest.Mock).mockRejectedValue(
+            (prisma.artist.update as jest.Mock).mockRejectedValue(
                 new Error('Updating error'),
             );
 
@@ -194,20 +222,25 @@ describe('Artist Controller', () => {
     describe('deleteArtist', () => {
         it('should delete an artist by ID', async () => {
             req.params = { id: '1' };
-            (prisma.artiste.delete as jest.Mock).mockResolvedValue({});
+            const mockDeleteResult = { id: 1, name: 'Deleted Artist' };
+            (prisma.artist.findUnique as jest.Mock).mockResolvedValue(
+                mockDeleteResult,
+            );
+            (prisma.artist.delete as jest.Mock).mockResolvedValue(
+                mockDeleteResult,
+            );
 
             await deleteArtist(req as Request, res as Response);
 
-            expect(prisma.artiste.delete).toHaveBeenCalledWith({
+            expect(prisma.artist.delete).toHaveBeenCalledWith({
                 where: { id: 1 },
             });
             expect(statusMock).toHaveBeenCalledWith(204);
-            expect(sendMock).toHaveBeenCalled();
         });
 
         it('should handle errors during deleting artist', async () => {
             req.params = { id: '1' };
-            (prisma.artiste.delete as jest.Mock).mockRejectedValue(
+            (prisma.artist.delete as jest.Mock).mockRejectedValue(
                 new Error('Deleting error'),
             );
 

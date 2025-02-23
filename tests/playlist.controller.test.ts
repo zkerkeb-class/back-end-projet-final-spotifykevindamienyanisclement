@@ -1,3 +1,11 @@
+import {
+    describe,
+    expect,
+    jest,
+    it,
+    beforeEach,
+    afterEach,
+} from '@jest/globals';
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import {
@@ -31,7 +39,10 @@ describe('Playlist Controller', () => {
     let sendMock: jest.Mock;
 
     beforeEach(() => {
-        req = {};
+        req = {
+            query: { limit: '10', offset: '0' },
+            user: { userId: 1 },
+        };
         jsonMock = jest.fn();
         sendMock = jest.fn();
         statusMock = jest.fn(() => ({ json: jsonMock, send: sendMock }));
@@ -86,6 +97,7 @@ describe('Playlist Controller', () => {
 
     describe('getPlaylists', () => {
         it('should get all playlist musics', async () => {
+            req.query = { limit: '10', offset: '0' };
             const playlists = [
                 { id: 1, title: 'Playlist 1', userId: 1 },
                 { id: 2, title: 'Playlist 2', userId: 2 },
@@ -128,6 +140,15 @@ describe('Playlist Controller', () => {
 
             expect(prisma.playlist.findUnique).toHaveBeenCalledWith({
                 where: { id: 1 },
+                include: {
+                    image: true,
+                    tracks: {
+                        include: {
+                            sound: true,
+                        },
+                    },
+                    user: true,
+                },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith(playlist);
@@ -179,6 +200,9 @@ describe('Playlist Controller', () => {
             expect(prisma.playlist.update).toHaveBeenCalledWith({
                 where: { id: 1 },
                 data: { title: 'Updated Playlist', userId: 1 },
+                include: {
+                    image: true,
+                },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith(updatedPlaylist);

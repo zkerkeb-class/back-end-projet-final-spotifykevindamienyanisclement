@@ -7,23 +7,23 @@ const prisma = new PrismaClient();
 
 export const createTrack = async (req: Request, res: Response) => {
     try {
-        const albumId = parseInt(req.params.albumId);
-        if (!albumId) {
-            res.status(400).json({ error: 'Album ID is required' });
-            return;
-        }
         const data: ITrackCreate = req.body;
 
         const album = await prisma.album.findFirst({
             where: {
-                id: albumId,
+                id: data?.albumId,
             },
         });
+
+        if (!album) {
+            res.status(404).json({ error: 'Album non trouvé' });
+            return;
+        }
 
         const track = await prisma.track.create({
             data: {
                 ...data,
-                albumId,
+                albumId: album?.id,
                 artistId: album?.artistId,
                 groupId: album?.groupId,
             },

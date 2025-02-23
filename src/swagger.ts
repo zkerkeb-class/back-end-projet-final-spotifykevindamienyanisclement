@@ -42,6 +42,14 @@ const doc = {
             name: 'User',
             description: 'User related apis',
         },
+        {
+            name: 'Metrics',
+            description: 'Metrics related apis',
+        },
+        {
+            name: 'JamSession',
+            description: 'JamSession related apis',
+        },
     ],
     securityDefinitions: {
         bearerAuth: {
@@ -179,6 +187,7 @@ const doc = {
             $id: 1,
             $name: 'Artist Name',
             $image: { $ref: '#/definitions/imageResponse' },
+            $groupIds: [1],
             $createdAt: '2021-09-01T00:00:00.000Z',
             $updatedAt: '2021-09-01T00:00:00.000Z',
         },
@@ -188,6 +197,8 @@ const doc = {
             $name: 'Artist Name',
             $image: { $ref: '#/definitions/imageResponse' },
             $albums: [{ $ref: '#/definitions/albumResponse' }],
+            $groupIds: [1],
+            $groups: [{ $ref: '#/definitions/groupResponse' }],
             $createdAt: '2021-09-01T00:00:00.000Z',
             $updatedAt: '2021-09-01T00:00:00.000Z',
         },
@@ -302,6 +313,117 @@ const doc = {
                     $ref: '#/definitions/userResponse',
                 },
             },
+        },
+
+        getBuisnessData: {
+            type: 'object',
+            properties: {
+                Streams: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            date: { type: 'string' },
+                            count: { type: 'number' },
+                        },
+                    },
+                },
+                ActiveUsers: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            date: { type: 'string' },
+                            count: { type: 'number' },
+                        },
+                    },
+                },
+            },
+        },
+        getAveragePerformanceByEndpoint: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    endpoint: { type: 'string' },
+                    _avg: {
+                        type: 'object',
+                        properties: {
+                            duration: { type: 'number' },
+                            responseTime: { type: 'number' },
+                            heapUsed: { type: 'number' },
+                            heapTotal: { type: 'number' },
+                            rss: { type: 'number' },
+                            cpu: { type: 'number' },
+                            bandwidth: { type: 'number' },
+                        },
+                    },
+                    _count: {
+                        type: 'object',
+                        properties: {
+                            endpoint: { type: 'number' },
+                        },
+                    },
+                },
+            },
+        },
+        getSystemPerformance: {
+            type: 'array',
+            items: {
+                type: 'array',
+                properties: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'number' },
+                        method: { type: 'string' },
+                        url: { type: 'string' },
+                        endpoint: { type: 'string' },
+                        status: { type: 'number' },
+                        duration: { type: 'number' },
+                        responseTime: { type: 'number' },
+                        statusCodeDistribution: { type: 'string' },
+                        heapUsed: { type: 'number' },
+                        heapTotal: { type: 'number' },
+                        rss: { type: 'number' },
+                        cpu: { type: 'number' },
+                        bandwidth: { type: 'number' },
+                        createdAt: { type: 'string' },
+                        updatedAt: { type: 'string' },
+                    },
+                },
+            },
+        },
+        jamSessionCreate: {
+            $name: 'Session Name',
+        },
+
+        jamSessionResponse: {
+            id: 1,
+            name: 'Session Name',
+            hostId: 1,
+            currentTrackId: 1,
+            host: { $ref: '#/definitions/userResponse' },
+            currentTrack: { $ref: '#/definitions/trackRequest' },
+            participants: [
+                {
+                    userId: 1,
+                    sessionId: 1,
+                    user: { $ref: '#/definitions/userResponse' },
+                },
+            ],
+            createdAt: '2021-09-01T00:00:00.000Z',
+            updatedAt: '2021-09-01T00:00:00.000Z',
+        },
+
+        jamSessionUpdate: {
+            $trackId: 1,
+        },
+
+        jamSessionParticipant: {
+            userId: 1,
+            sessionId: 1,
+            user: { $ref: '#/definitions/userResponse' },
+            session: { $ref: '#/definitions/jamSessionResponse' },
         },
     },
     security: [

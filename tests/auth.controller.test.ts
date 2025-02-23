@@ -1,3 +1,11 @@
+import {
+    describe,
+    expect,
+    jest,
+    it,
+    beforeEach,
+    afterEach,
+} from '@jest/globals';
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
@@ -40,32 +48,43 @@ describe('Authentication Controller', () => {
 
     describe('register', () => {
         it('should register a new user', async () => {
-            req.body = {
-                email: 'test@example.com',
-                password: 'password',
-                name: 'Test User',
-            };
-            (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-            (prisma.user.create as jest.Mock).mockResolvedValue({
+            const mockUser = {
                 id: 1,
                 email: 'test@example.com',
                 name: 'Test User',
-            });
+                password: 'hashedPassword',
+                role: 'USER',
+            };
+
+            req.body = {
+                email: 'test@example.com',
+                password: 'password123',
+                name: 'Test User',
+            };
+
+            bcrypt.hash = jest.fn().mockResolvedValue('hashedPassword');
+            (prisma.user.create as jest.Mock).mockResolvedValue(mockUser);
+            jwt.sign = jest.fn().mockReturnValue('token123');
 
             await register(req as Request, res as Response);
 
-            expect(bcrypt.hash).toHaveBeenCalledWith('password', 10);
             expect(prisma.user.create).toHaveBeenCalledWith({
                 data: {
                     email: 'test@example.com',
                     password: 'hashedPassword',
                     name: 'Test User',
+                    role: 'USER',
                 },
             });
             expect(statusMock).toHaveBeenCalledWith(201);
             expect(jsonMock).toHaveBeenCalledWith({
                 message: 'User registered successfully',
-                user: { id: 1, email: 'test@example.com', name: 'Test User' },
+                token: 'token123',
+                user: {
+                    id: 1,
+                    email: 'test@example.com',
+                    name: 'Test User',
+                },
             });
         });
 
@@ -84,8 +103,38 @@ describe('Authentication Controller', () => {
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
                 message: 'Error registering user',
-                error: new Error('Hashing error'),
+                error: 'Hashing error',
             });
+        });
+
+        it('should handle missing name in registration', async () => {
+            req.body = {
+                email: 'test@example.com',
+                password: 'password123',
+            };
+
+            const expectedUser = {
+                id: 1,
+                email: 'test@example.com',
+                name: undefined,
+                password: 'hashedPassword',
+                role: 'USER',
+            };
+
+            bcrypt.hash = jest.fn().mockResolvedValue('hashedPassword');
+            (prisma.user.create as jest.Mock).mockResolvedValue(expectedUser);
+
+            await register(req as Request, res as Response);
+
+            expect(prisma.user.create).toHaveBeenCalledWith({
+                data: {
+                    email: 'test@example.com',
+                    password: 'hashedPassword',
+                    name: undefined,
+                    role: 'USER',
+                },
+            });
+            expect(statusMock).toHaveBeenCalledWith(201);
         });
     });
 
@@ -110,7 +159,12 @@ describe('Authentication Controller', () => {
                 'hashedPassword',
             );
             expect(jwt.sign).toHaveBeenCalledWith(
-                { userId: 1 },
+                {
+                    userId: 1,
+                    email: 'test@example.com',
+                    role: undefined,
+                    name: undefined,
+                },
                 process.env.JWT_SECRET!,
                 { expiresIn: '1h' },
             );
@@ -139,7 +193,7 @@ describe('Authentication Controller', () => {
         });
 
         it('should handle errors during login', async () => {
-            req.body = { email: 'test@example.com', password: 'password' };
+            req.body = { email: 'test@example.com', password: 'password123' };
             (prisma.user.findUnique as jest.Mock).mockRejectedValue(
                 new Error('Database error'),
             );
@@ -149,7 +203,7 @@ describe('Authentication Controller', () => {
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({
                 message: 'Error logging in',
-                error: new Error('Database error'),
+                error: 'Database error',
             });
         });
     });

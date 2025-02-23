@@ -6,8 +6,10 @@ import playlistRoute from './playlist.route';
 import groupRoute from './group.route';
 import uploadRoute from './upload.route';
 import trackRoute from './track.route';
+import metricsRoutes from './metrics.route';
 import getAllTracks from './track.route';
 import userRoute from './user.route';
+import jamSessionRoute from './jamSession.route';
 
 import verifyToken from '../middlewares/verifyToken';
 
@@ -107,6 +109,7 @@ router.use('/upload', uploadRoute);
  */
 router.use('/album/:albumId/track', trackRoute);
 
+router.use('/metrics', metricsRoutes);
 /**
  * @swagger
  * /tracks:
@@ -132,5 +135,18 @@ router.use('/track', getAllTracks);
  *         description: user resource
  */
 router.use('/user', userRoute);
+
+/**
+ * @swagger
+ * /jam-session:
+ *   get:
+ *     tags:
+ *       - JamSession
+ *     summary: Get jam session resource
+ *     responses:
+ *       200:
+ *         description: Jam session resource
+ */
+router.use('/jam-session', jamSessionRoute);
 
 export default router;

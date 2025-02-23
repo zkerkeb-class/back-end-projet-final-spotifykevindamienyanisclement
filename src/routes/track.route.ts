@@ -15,27 +15,6 @@ import { auditLog } from '../middlewares/auditLog';
 
 const router = express.Router({ mergeParams: true });
 
-router.post(
-    '/',
-    authorize([Permissions.CREATE_TRACK]),
-    validateRequest(trackSchema.albumIdParam, 'params'),
-    validateRequest(trackSchema.create, 'body'),
-    /* #swagger.tags = ['Track']
-       #swagger.description = 'Create a new track in album'
-       #swagger.path = '/album/{albumId}/track'
-       #swagger.parameters["body"] = {
-            in: 'body',
-            name: 'body',
-            required: true,
-            schema: { $ref: '#/definitions/trackCreate' }
-       }
-       #swagger.responses[201] = { schema: { $ref: '#/definitions/successResponse.201' } }
-       #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
-    */
-    auditLog('CREATE_TRACK'),
-    createTrack,
-);
-
 router.get(
     '/',
     authorize([Permissions.READ_TRACK]),
@@ -64,6 +43,26 @@ router.get(
 );
 
 const getAllTracksRouter = express.Router();
+
+getAllTracksRouter.post(
+    '/',
+    authorize([Permissions.CREATE_TRACK]),
+    validateRequest(trackSchema.create, 'body'),
+    /* #swagger.tags = ['Track']
+       #swagger.description = 'Create a new track in album'
+       #swagger.path = '/track'
+       #swagger.parameters["body"] = {
+            in: 'body',
+            name: 'body',
+            required: true,
+            schema: { $ref: '#/definitions/trackCreate' }
+       }
+       #swagger.responses[201] = { schema: { $ref: '#/definitions/successResponse.201' } }
+       #swagger.responses[500] = { schema: { $ref: '#/definitions/errorResponse.500' } }
+    */
+    auditLog('CREATE_TRACK'),
+    createTrack,
+);
 
 getAllTracksRouter.get(
     '/',

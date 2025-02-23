@@ -8,6 +8,14 @@ const config: Config.InitialOptions = {
     testPathIgnorePatterns: ['/node_modules/', '/dist/'],
     coverageDirectory: 'coverage',
     testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
+    transform: {
+        '^.+\\.tsx?$': [
+            'ts-jest',
+            {
+                tsconfig: 'tsconfig.json',
+            },
+        ],
+    },
 };
 
 export default config;

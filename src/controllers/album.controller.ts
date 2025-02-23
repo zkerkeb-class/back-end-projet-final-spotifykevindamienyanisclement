@@ -12,12 +12,11 @@ import logger from '../config/logger';
 const prisma = new PrismaClient();
 
 export const createAlbum = async (req: Request, res: Response) => {
-    const { title, imageId, artistId, groupId, tracks }: IAlbumCreate =
-        req.body;
+    const { artistId, groupId, tracks }: IAlbumCreate = req.body;
 
     try {
         const album: IAlbum = await prisma.album.create({
-            data: { title, imageId, artistId, groupId },
+            data: req.body,
             include: { image: true },
         });
         if (tracks) {

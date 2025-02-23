@@ -45,6 +45,7 @@ export interface ITrack {
 export interface ITrackCreate {
     title: string;
     soundId: number;
+    albumId: number;
 }
 
 export interface ITrackCreateFull {

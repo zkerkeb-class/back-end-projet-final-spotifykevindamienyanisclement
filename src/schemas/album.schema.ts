@@ -3,9 +3,9 @@ import Joi from 'joi';
 export const albumSchema = {
     create: Joi.object({
         title: Joi.string().required().min(1).max(255),
-        artistId: Joi.number().positive(),
-        groupId: Joi.number().positive(),
         imageId: Joi.number().required().positive(),
+        artistId: Joi.number().positive().allow(null),
+        groupId: Joi.number().positive().allow(null),
 
         tracks: Joi.array()
             .items(
@@ -14,8 +14,7 @@ export const albumSchema = {
                     soundId: Joi.number().required().positive(),
                 }),
             )
-            .required()
-            .min(1),
+            .allow(null),
     }),
 
     update: Joi.object({

@@ -1,5 +1,14 @@
+import {
+    describe,
+    expect,
+    jest,
+    it,
+    beforeEach,
+    afterEach,
+} from '@jest/globals';
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { MockResponse, createMockRes } from './setup';
 import {
     createAlbum,
     getAlbums,
@@ -11,11 +20,21 @@ import {
 jest.mock('@prisma/client', () => {
     const mPrismaClient = {
         album: {
-            create: jest.fn(),
-            findMany: jest.fn(),
-            findUnique: jest.fn(),
-            update: jest.fn(),
-            delete: jest.fn(),
+            create: jest
+                .fn()
+                .mockResolvedValue({ id: 1, title: 'Test Album', artistId: 1 }),
+            findMany: jest
+                .fn()
+                .mockResolvedValue([{ id: 1, title: 'Album 1', artistId: 1 }]),
+            findUnique: jest
+                .fn()
+                .mockResolvedValue({ id: 1, title: 'Album 1', artistId: 1 }),
+            update: jest.fn().mockResolvedValue({
+                id: 1,
+                title: 'Updated Album',
+                artistId: 1,
+            }),
+            delete: jest.fn().mockResolvedValue({}),
         },
     };
     return { PrismaClient: jest.fn(() => mPrismaClient) };
@@ -25,21 +44,11 @@ const prisma = new PrismaClient();
 
 describe('Album Controller', () => {
     let req: Partial<Request>;
-    let res: Partial<Response>;
-    let jsonMock: jest.Mock;
-    let statusMock: jest.Mock;
-    let sendMock: jest.Mock;
+    let res: MockResponse;
 
     beforeEach(() => {
         req = {};
-        jsonMock = jest.fn();
-        sendMock = jest.fn();
-        statusMock = jest.fn(() => ({ json: jsonMock, send: sendMock }));
-        res = {
-            status: statusMock,
-            json: jsonMock,
-            send: sendMock,
-        };
+        res = createMockRes();
     });
 
     afterEach(() => {
@@ -60,8 +69,8 @@ describe('Album Controller', () => {
             expect(prisma.album.create).toHaveBeenCalledWith({
                 data: { title: 'Test Album', artistId: 1 },
             });
-            expect(statusMock).toHaveBeenCalledWith(201);
-            expect(jsonMock).toHaveBeenCalledWith({
+            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.json).toHaveBeenCalledWith({
                 id: 1,
                 title: 'Test Album',
                 artistId: 1,
@@ -76,8 +85,8 @@ describe('Album Controller', () => {
 
             await createAlbum(req as Request, res as Response);
 
-            expect(statusMock).toHaveBeenCalledWith(500);
-            expect(jsonMock).toHaveBeenCalledWith({
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith({
                 message: 'Error creating music album',
                 error: new Error('Creation error'),
             });
@@ -86,6 +95,7 @@ describe('Album Controller', () => {
 
     describe('getAlbums', () => {
         it('should get all music albums', async () => {
+            req.query = { limit: '10', offset: '0' };
             const albums = [
                 { id: 1, title: 'Album 1', artistId: 1 },
                 { id: 2, title: 'Album 2', artistId: 2 },
@@ -95,8 +105,8 @@ describe('Album Controller', () => {
             await getAlbums(req as Request, res as Response);
 
             expect(prisma.album.findMany).toHaveBeenCalled();
-            expect(statusMock).toHaveBeenCalledWith(200);
-            expect(jsonMock).toHaveBeenCalledWith(albums);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(albums);
         });
 
         it('should handle errors during fetching albums', async () => {
@@ -106,8 +116,8 @@ describe('Album Controller', () => {
 
             await getAlbums(req as Request, res as Response);
 
-            expect(statusMock).toHaveBeenCalledWith(500);
-            expect(jsonMock).toHaveBeenCalledWith({
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith({
                 message: 'Error fetching music albums',
                 error: new Error('Fetching error'),
             });
@@ -124,9 +134,27 @@ describe('Album Controller', () => {
 
             expect(prisma.album.findUnique).toHaveBeenCalledWith({
                 where: { id: 1 },
+                include: {
+                    image: true,
+                    artist: {
+                        include: {
+                            image: true,
+                        },
+                    },
+                    group: {
+                        include: {
+                            image: true,
+                        },
+                    },
+                    tracks: {
+                        include: {
+                            sound: true,
+                        },
+                    },
+                },
             });
-            expect(statusMock).toHaveBeenCalledWith(200);
-            expect(jsonMock).toHaveBeenCalledWith(album);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(album);
         });
 
         it('should return 404 if album not found', async () => {
@@ -135,8 +163,8 @@ describe('Album Controller', () => {
 
             await getAlbumById(req as Request, res as Response);
 
-            expect(statusMock).toHaveBeenCalledWith(404);
-            expect(jsonMock).toHaveBeenCalledWith({
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({
                 message: 'Music album not found',
             });
         });
@@ -149,8 +177,8 @@ describe('Album Controller', () => {
 
             await getAlbumById(req as Request, res as Response);
 
-            expect(statusMock).toHaveBeenCalledWith(500);
-            expect(jsonMock).toHaveBeenCalledWith({
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith({
                 message: 'Error fetching music album',
                 error: new Error('Fetching error'),
             });
@@ -173,9 +201,10 @@ describe('Album Controller', () => {
             expect(prisma.album.update).toHaveBeenCalledWith({
                 where: { id: 1 },
                 data: { title: 'Updated Album', artistId: 1 },
+                include: { image: true },
             });
-            expect(statusMock).toHaveBeenCalledWith(200);
-            expect(jsonMock).toHaveBeenCalledWith(updatedAlbum);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(updatedAlbum);
         });
 
         it('should handle errors during updating album', async () => {
@@ -187,8 +216,8 @@ describe('Album Controller', () => {
 
             await updateAlbum(req as Request, res as Response);
 
-            expect(statusMock).toHaveBeenCalledWith(500);
-            expect(jsonMock).toHaveBeenCalledWith({
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith({
                 message: 'Error updating music album',
                 error: new Error('Updating error'),
             });
@@ -205,8 +234,8 @@ describe('Album Controller', () => {
             expect(prisma.album.delete).toHaveBeenCalledWith({
                 where: { id: 1 },
             });
-            expect(statusMock).toHaveBeenCalledWith(204);
-            expect(sendMock).toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(204);
+            expect(res.send).toHaveBeenCalled();
         });
 
         it('should handle errors during deleting album', async () => {
@@ -217,8 +246,8 @@ describe('Album Controller', () => {
 
             await deleteAlbum(req as Request, res as Response);
 
-            expect(statusMock).toHaveBeenCalledWith(500);
-            expect(jsonMock).toHaveBeenCalledWith({
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith({
                 message: 'Error deleting music album',
                 error: new Error('Deleting error'),
             });

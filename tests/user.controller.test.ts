@@ -1,3 +1,11 @@
+import {
+    describe,
+    expect,
+    jest,
+    it,
+    beforeEach,
+    afterEach,
+} from '@jest/globals';
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import {
@@ -6,6 +14,7 @@ import {
     getUserById,
     updateUser,
     deleteUser,
+    markTrackAsRead,
 } from '../src/controllers/user.controller';
 
 jest.mock('@prisma/client', () => {
@@ -16,6 +25,12 @@ jest.mock('@prisma/client', () => {
             findUnique: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
+        },
+        track: {
+            findFirst: jest.fn(),
+        },
+        trackRead: {
+            create: jest.fn(),
         },
     };
     return { PrismaClient: jest.fn(() => mPrismaClient) };
@@ -98,9 +113,10 @@ describe('User Controller', () => {
 
     describe('getUsers', () => {
         it('should get all users', async () => {
+            req.query = { limit: '10', offset: '0' };
             const users = [
-                { id: 1, email: 'test1@example.com', name: 'Test User 1' },
-                { id: 2, email: 'test2@example.com', name: 'Test User 2' },
+                { id: 1, email: 'user1@test.com', name: 'User 1' },
+                { id: 2, email: 'user2@test.com', name: 'User 2' },
             ];
             (prisma.user.findMany as jest.Mock).mockResolvedValue(users);
 
@@ -112,6 +128,7 @@ describe('User Controller', () => {
         });
 
         it('should handle errors during fetching users', async () => {
+            req.query = { limit: '10', offset: '0' };
             (prisma.user.findMany as jest.Mock).mockRejectedValue(
                 new Error('Fetching error'),
             );
@@ -140,6 +157,13 @@ describe('User Controller', () => {
 
             expect(prisma.user.findUnique).toHaveBeenCalledWith({
                 where: { id: 1 },
+                include: {
+                    playlists: {
+                        include: {
+                            image: true,
+                        },
+                    },
+                },
             });
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith(user);
@@ -249,6 +273,31 @@ describe('User Controller', () => {
             expect(jsonMock).toHaveBeenCalledWith({
                 message: 'Error deleting user',
                 error: new Error('Deleting error'),
+            });
+        });
+    });
+
+    describe('markTrackAsRead', () => {
+        it('should mark a track as read', async () => {
+            req.user = { userId: 1 };
+            req.params = { trackId: '1' };
+
+            const mockTrack = {
+                id: 1,
+                title: 'Test Track',
+            };
+
+            (prisma.track.findFirst as jest.Mock).mockResolvedValue(mockTrack);
+            (prisma.trackRead.create as jest.Mock).mockResolvedValue({
+                userId: 1,
+                trackId: 1,
+            });
+
+            await markTrackAsRead(req as Request, res as Response);
+
+            expect(statusMock).toHaveBeenCalledWith(201);
+            expect(jsonMock).toHaveBeenCalledWith({
+                message: 'Track marqué comme lu',
             });
         });
     });

@@ -14,6 +14,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import performanceMiddleware from './middlewares/performance';
+import { createServer } from 'http';
+import WebSocketService from './services/websocket.service';
 
 dotenv.config();
 
@@ -143,17 +145,21 @@ app.use(function (err: any, req: Request, res: Response) {
     res.render('error');
 });
 
-// -------------- start the server
+const server = createServer(app);
+const wsService = new WebSocketService(server);
+global.wsService = wsService;
 
-app.listen(PORT, () => {
-    logger.info(`Server is running on address: http://localhost:${PORT}`);
-    logger.info(
-        `API documentation is running on address: http://localhost:${PORT}/api-docs`,
-    );
-}).on('error', (error: any) => {
-    logger.fatal(error, 'Server failed to start');
-    process.exit(1);
-});
+server
+    .listen(PORT, () => {
+        logger.info(`Server is running on address: http://localhost:${PORT}`);
+        logger.info(
+            `API documentation is running on address: http://localhost:${PORT}/api-docs`,
+        );
+    })
+    .on('error', (error: any) => {
+        logger.fatal(error, 'Server failed to start');
+        process.exit(1);
+    });
 
 module.exports = app;
 export default app;

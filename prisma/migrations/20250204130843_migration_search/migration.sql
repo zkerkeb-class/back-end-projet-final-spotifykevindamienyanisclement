@@ -1,0 +1,12 @@
+-- AlterTable
+ALTER TABLE "Album" ADD COLUMN     "genre" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "releaseYear" INTEGER NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE "Track" ADD COLUMN     "duration" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "genre" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "popularity" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "releaseYear" INTEGER NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE "artist" ADD COLUMN     "genre" TEXT NOT NULL DEFAULT '';
