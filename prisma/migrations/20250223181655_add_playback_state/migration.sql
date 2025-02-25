@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "JamSession" ADD COLUMN     "isPlaying" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "position" DOUBLE PRECISION NOT NULL DEFAULT 0;

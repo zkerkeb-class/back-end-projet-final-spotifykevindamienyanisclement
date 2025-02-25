@@ -1,0 +1,47 @@
+{
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.tabSize": 4,
+    "editor.indentSize": "tabSize",
+    "editor.insertSpaces": false,
+    "files.autoSave": "onFocusChange",
+    "javascript.validate.enable": false,
+    "eslint.enable": true,
+    "eslint.run": "onSave",
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "prettier.requireConfig": true,
+    "prettier.singleQuote": true,
+    "prettier.trailingComma": "all",
+    "prettier.arrowParens": "avoid",
+    "prettier.printWidth": 80,
+    "prettier.tabWidth": 2,
+    "prettier.useTabs": true,
+    "prettier.endOfLine": "lf",
+    "prettier.bracketSpacing": true,
+    "conventionalCommits.scopes": [
+        "controllers",
+        "middlewares",
+        "models",
+        "routes",
+        "utils",
+        "services",
+        "config",
+        "types",
+        "interfaces",
+        "enums",
+        "schemas",
+        "db",
+        "scripts",
+        "public",
+        "views",
+        "tests",
+        "docs"
+    ]
+}

@@ -1,0 +1,213 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Image {
+  id                 Int        @id @default(autoincrement())
+  formattedImageName String
+  formattedImageURL  String
+  originalImageName  String
+  originalImageURL   String
+  avifImageName      String
+  avifImageURL       String
+  smallImageName     String
+  smallImageURL      String
+  mediumImageName    String
+  mediumImageURL     String
+  largeImageName     String
+  largeImageURL      String
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  albums             Album[]
+  groups             Group[]
+  playlists          Playlist[]
+  artists            artist[]
+}
+
+model Sound {
+  id                Int      @id @default(autoincrement())
+  duration          Int
+  originalSoundName String
+  originalSoundURL  String
+  wavSoundName      String
+  wavSoundURL       String
+  m4aSoundName      String
+  m4aSoundURL       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tracks            Track[]
+}
+
+model User {
+  id                Int              @id @default(autoincrement())
+  email             String           @unique
+  name              String?
+  password          String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  role              Role             @default(USER)
+  AuditLog          AuditLog[]
+  playlists         Playlist[]
+  TrackRead         TrackRead[]
+  hostedSessions    JamSession[]     @relation("HostedSessions")
+  jamParticipations JamParticipant[]
+}
+
+model TrackRead {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  trackId   Int
+  createdAt DateTime @default(now())
+  track     Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model artist {
+  id        Int      @id @default(autoincrement())
+  name      String
+  imageId   Int?
+  groupId   Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  genre     String   @default("")
+  albums    Album[]
+  tracks    Track[]
+  group     Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  image     Image?   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+}
+
+model Album {
+  id          Int      @id @default(autoincrement())
+  title       String
+  imageId     Int?
+  groupId     Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  artistId    Int?
+  genre       String   @default("")
+  releaseYear Int      @default(0)
+  artist      artist?  @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  group       Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  image       Image?   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  tracks      Track[]
+}
+
+model Track {
+  id          Int          @id @default(autoincrement())
+  title       String
+  albumId     Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  playlistId  Int?
+  soundId     Int?
+  artistId    Int?
+  groupId     Int?
+  duration    Int          @default(0)
+  genre       String       @default("")
+  popularity  Int          @default(0)
+  releaseYear Int          @default(0)
+  album       Album        @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  artist      artist?      @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  group       Group?       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  playlist    Playlist?    @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  sound       Sound?       @relation(fields: [soundId], references: [id], onDelete: Cascade)
+  TrackRead   TrackRead[]
+  jamSessions JamSession[] @relation("CurrentTrack")
+}
+
+model Playlist {
+  id        Int      @id @default(autoincrement())
+  title     String
+  imageId   Int?
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  image     Image?   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tracks    Track[]
+}
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  name      String
+  imageId   Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  albums    Album[]
+  image     Image?   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  Track     Track[]
+  artists   artist[]
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  action     String
+  resource   String
+  resourceId Int?
+  details    String
+  ipAddress  String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model PerformanceMetric {
+  id                     Int      @id @default(autoincrement())
+  method                 String
+  url                    String
+  endpoint               String
+  status                 Int
+  duration               Float
+  responseTime           Float
+  statusCodeDistribution Json
+  heapUsed               Float
+  heapTotal              Float
+  rss                    Float
+  cpu                    Float?
+  bandwidth              Float?
+  createdAt              DateTime @default(now())
+}
+
+model JamSession {
+  id             Int      @id @default(autoincrement())
+  name           String
+  hostId         Int
+  currentTrackId Int?
+  isActive       Boolean  @default(true)
+  position       Float    @default(0)
+  isPlaying      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  host         User             @relation("HostedSessions", fields: [hostId], references: [id])
+  currentTrack Track?           @relation("CurrentTrack", fields: [currentTrackId], references: [id])
+  participants JamParticipant[]
+}
+
+model JamParticipant {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  sessionId Int
+  joinedAt  DateTime @default(now())
+
+  user    User       @relation(fields: [userId], references: [id])
+  session JamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sessionId])
+}
