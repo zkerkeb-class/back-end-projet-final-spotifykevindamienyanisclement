@@ -121,9 +121,12 @@ export const RolePermissions = {
         Permissions.UPDATE_PLAYLIST,
         Permissions.DELETE_PLAYLIST,
         Permissions.READ_CURRENT_USER,
+
         Permissions.CREATE_JAM_SESSION,
+        Permissions.READ_JAM_SESSION,
         Permissions.DELETE_JAM_SESSION,
         Permissions.JOIN_JAM_SESSION,
+        Permissions.UPDATE_JAM_SESSION,
         Permissions.LEAVE_JAM_SESSION,
     ],
 };
